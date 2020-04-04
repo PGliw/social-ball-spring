@@ -9,13 +9,12 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Entity
-public class Match {
+public class FootballMatch {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private LocalDate beginningTime;
     private LocalDate endingTime;
-    private boolean areTeamsPermament;
     @ManyToOne()
     private MatchMember matchMember;
 }

@@ -16,6 +16,6 @@ public class MatchMember {
     private boolean isConfirmed;
     @ManyToOne()
     private User user;
-    @OneToMany(targetEntity = Match.class, mappedBy = "matchMember")
-    private List<Match> appearancesOnMatches;
+    @OneToMany(targetEntity = FootballMatch.class, mappedBy = "matchMember")
+    private List<FootballMatch> appearancesOnMatches;
 }
