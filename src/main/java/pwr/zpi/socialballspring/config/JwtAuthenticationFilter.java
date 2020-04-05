@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
 
-import static pwr.zpi.socialballspring.config.Constants.*;
+import static pwr.zpi.socialballspring.config.AuthenticationConstants.*;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -58,7 +58,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
-
         chain.doFilter(req, res);
     }
 }
