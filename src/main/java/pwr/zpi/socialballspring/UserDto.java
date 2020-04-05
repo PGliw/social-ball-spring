@@ -1,18 +1,10 @@
 package pwr.zpi.socialballspring;
 
-import lombok.Getter;
-import lombok.Setter;
-
-import javax.persistence.*;
+import javax.persistence.OneToMany;
 import java.time.LocalDate;
 import java.util.List;
 
-@Getter
-@Setter
-@Entity
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+public class UserDto {
     private Long id;
     private String firstName;
     private String lastName;
