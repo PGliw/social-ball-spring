@@ -17,6 +17,4 @@ public class UserDto {
     private String password;
     private String email;
     private String username;
-    @OneToMany(targetEntity = MatchMember.class, mappedBy = "user")
-    private List<MatchMember> appearancesAsMatchMember;
 }
