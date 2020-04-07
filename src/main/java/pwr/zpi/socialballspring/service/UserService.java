@@ -1,7 +1,7 @@
 package pwr.zpi.socialballspring.service;
 
-import pwr.zpi.socialballspring.User;
-import pwr.zpi.socialballspring.UserDto;
+import pwr.zpi.socialballspring.model.User;
+import pwr.zpi.socialballspring.dto.UserDto;
 
 import java.util.List;
 

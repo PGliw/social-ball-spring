@@ -8,8 +8,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import pwr.zpi.socialballspring.User;
-import pwr.zpi.socialballspring.UserDto;
+import pwr.zpi.socialballspring.model.User;
+import pwr.zpi.socialballspring.dto.UserDto;
+import pwr.zpi.socialballspring.repository.UserDao;
 
 import java.util.ArrayList;
 import java.util.Arrays;

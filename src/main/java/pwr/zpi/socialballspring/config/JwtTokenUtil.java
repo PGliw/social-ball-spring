@@ -6,7 +6,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import pwr.zpi.socialballspring.User;
+import pwr.zpi.socialballspring.model.User;
 
 import java.io.Serializable;
 import java.util.Arrays;
