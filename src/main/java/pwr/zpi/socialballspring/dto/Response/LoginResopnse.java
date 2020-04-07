@@ -1,11 +1,11 @@
-package pwr.zpi.socialballspring.dto;
+package pwr.zpi.socialballspring.dto.Response;
 
 import lombok.*;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuthToken {
+public class LoginResopnse {
     private String token;
     private String username;
 }

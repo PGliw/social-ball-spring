@@ -8,9 +8,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import pwr.zpi.socialballspring.model.User;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 import static pwr.zpi.socialballspring.config.AuthenticationConstants.*;
@@ -18,10 +21,12 @@ import static pwr.zpi.socialballspring.config.AuthenticationConstants.*;
 @Component
 public class JwtTokenUtil implements Serializable {
 
+    // retrieve username from jwt token
     public String getUsernameFromToken(String token) {
         return getClaimFromToken(token, Claims::getSubject);
     }
 
+    // retrieve expiration date from jwt token
     public Date getExpirationDateFromToken(String token) {
         return getClaimFromToken(token, Claims::getExpiration);
     }
@@ -31,6 +36,7 @@ public class JwtTokenUtil implements Serializable {
         return claimsResolver.apply(claims);
     }
 
+    // for retrieving any information from token we need the secret key
     private Claims getAllClaimsFromToken(String token) {
         return Jwts.parser()
                 .setSigningKey(SIGNING_KEY)
@@ -38,15 +44,22 @@ public class JwtTokenUtil implements Serializable {
                 .getBody();
     }
 
+    // check if the token has expired
     private Boolean isTokenExpired(String token) {
         final Date expiration = getExpirationDateFromToken(token);
         return expiration.before(new Date());
     }
 
-    public String generateToken(User user) {
-        return doGenerateToken(user.getUsername());
+    // generate token for user
+    public String generateToken(UserDetails userDetails) {
+    //    Map<String, Object> claims = new HashMap<>();
+        return doGenerateToken(userDetails.getUsername());
     }
 
+    // While creating the token
+    // 1. Define claims of the token (eg. Issuer. Expiration, Subject, ID)
+    // 2. Sign the JWT using HS512 algorithm and secret key
+    // 3. Compact JWT to String
     private String doGenerateToken(String subject) {
 
         Claims claims = Jwts.claims().setSubject(subject);
@@ -61,6 +74,7 @@ public class JwtTokenUtil implements Serializable {
                 .compact();
     }
 
+    // validate token
     public Boolean validateToken(String token, UserDetails userDetails) {
         final String username = getUsernameFromToken(token);
         return (
