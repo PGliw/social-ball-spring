@@ -1,13 +1,11 @@
-package pwr.zpi.socialballspring;
+package pwr.zpi.socialballspring.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 
-@Getter
-@Setter
+@Data
 @Entity
 public class FootballMatch {
     @Id

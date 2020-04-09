@@ -1,4 +1,4 @@
-package pwr.zpi.socialballspring;
+package pwr.zpi.socialballspring.model;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -6,14 +6,14 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import pwr.zpi.socialballspring.User;
 
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.function.Function;
 
-import static pwr.zpi.socialballspring.config.AuthenticationConstants.*;
+import static pwr.zpi.socialballspring.config.AuthenticationConstants.ACCESS_TOKEN_VALIDITY_SECONDS;
+import static pwr.zpi.socialballspring.config.AuthenticationConstants.SIGNING_KEY;
 
 @Component
 public class JwtTokenUtil implements Serializable {
@@ -43,10 +43,14 @@ public class JwtTokenUtil implements Serializable {
         return expiration.before(new Date());
     }
 
-    public String generateToken(User user) {
-        return doGenerateToken(user.getUsername());
+    public String generateToken(UserDetails userDetails) {
+        return doGenerateToken(userDetails.getUsername());
     }
 
+    // While creating the token
+    // 1. Define claims of the token (eg. Issuer. Expiration, Subject, ID)
+    // 2. Sign the JWT using HS512 algorithm and secret key
+    // 3. Compact JWT to String
     private String doGenerateToken(String subject) {
 
         Claims claims = Jwts.claims().setSubject(subject);
@@ -56,7 +60,7 @@ public class JwtTokenUtil implements Serializable {
                 .setClaims(claims)
                 .setIssuer("SportApp")
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_VALIDITY_SECONDS*1000))
+                .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_VALIDITY_SECONDS * 1000))
                 .signWith(SignatureAlgorithm.HS256, SIGNING_KEY)
                 .compact();
     }

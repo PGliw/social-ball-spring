@@ -8,13 +8,18 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import pwr.zpi.socialballspring.User;
-import pwr.zpi.socialballspring.UserDto;
+import pwr.zpi.socialballspring.dto.Response.UserResponse;
+import pwr.zpi.socialballspring.dto.UserDto;
+import pwr.zpi.socialballspring.exception.DuplicateException;
+import pwr.zpi.socialballspring.exception.NotFoundException;
+import pwr.zpi.socialballspring.model.User;
+import pwr.zpi.socialballspring.repository.UserDao;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service(value = "userService")
@@ -28,24 +33,24 @@ public class UserServiceImpl implements UserDetailsService, UserService {
 
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userDao.findByUsername(username);
-        if(user == null){
+        if (user == null) {
             throw new UsernameNotFoundException("Invalid username or password.");
         }
-        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), getAuthority());
+        return new org.springframework.security.core.userdetails.User(user.getUsername(), new String(user.getPassword()), getAuthority());
     }
 
     private List<SimpleGrantedAuthority> getAuthority() {
         return Arrays.asList(new SimpleGrantedAuthority("ROLE_ADMIN"));
     }
 
-    public List<User> findAll() {
+    public List<UserResponse> findAll() {
         List<User> list = new ArrayList<>();
         userDao.findAll().iterator().forEachRemaining(list::add);
-        return list;
+        return list.stream().map(UserResponse::new).collect(Collectors.toList());
     }
 
     @Override
-    public void delete(int id) {
+    public void delete(long id) {
         userDao.deleteById(id);
     }
 
@@ -55,32 +60,43 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     }
 
     @Override
-    public User findById(int id) {
+    public UserResponse findById(long id) {
         Optional<User> optionalUser = userDao.findById(id);
-        return optionalUser.isPresent() ? optionalUser.get() : null;
+        return optionalUser.map(UserResponse::new).orElseThrow(() -> new NotFoundException("User"));
     }
 
     @Override
-    public UserDto update(UserDto userDto) {
-        User user = findById(userDto.getId().intValue());
-        if(user != null) {
+    public UserResponse update(UserDto userDto) {
+        long userId = userDto.getId();
+        Optional<User> optionalUser = userDao.findById(userId);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
             BeanUtils.copyProperties(userDto, user, "password");
-            userDao.save(user);
-        }
-        return userDto;
+            User savedUser = userDao.save(user);
+            return new UserResponse(savedUser);
+        } else throw new NotFoundException("User");
     }
 
     @Override
-    public User save(UserDto user) {
-        User newUser = new User();
-        newUser.setEmail(user.getEmail());
-        newUser.setFirstName(user.getFirstName());
-        newUser.setLastName(user.getLastName());
-        newUser.setPassword(bcryptEncoder.encode(user.getPassword()));
-        newUser.setDateOfBirth(user.getDateOfBirth());
-        newUser.setUsername(user.getUsername());
-        newUser.setImage(user.getImage());
-        newUser.setAppearancesAsMatchMember(user.getAppearancesAsMatchMember());
-        return userDao.save(newUser);
+    public UserResponse save(UserDto userDto) {
+        // if user with given email exists then throw http exception
+        Optional<User> existingUser = userDao.findByEmail(userDto.getEmail());
+        if (existingUser.isPresent()) {
+            throw new DuplicateException("User");
+        }
+
+        // build user from DTO
+        User newUser = User.builder()
+                .email(userDto.getEmail())
+                .firstName(userDto.getFirstName())
+                .lastName(userDto.getLastName())
+                .username(userDto.getUsername())
+                .password(bcryptEncoder.encode(new String(userDto.getPassword())).toCharArray())
+                .dateOfBirth(userDto.getDateOfBirth())
+                .image(userDto.getImage())
+                .build();
+
+        // save the user and return UserResponse
+        return new UserResponse(userDao.save(newUser));
     }
 }
