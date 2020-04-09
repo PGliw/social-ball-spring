@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserDetailsService, UserService {
         if (user == null) {
             throw new UsernameNotFoundException("Invalid username or password.");
         }
-        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), getAuthority());
+        return new org.springframework.security.core.userdetails.User(user.getUsername(), new String(user.getPassword()), getAuthority());
     }
 
     private List<SimpleGrantedAuthority> getAuthority() {
@@ -71,7 +71,7 @@ public class UserServiceImpl implements UserDetailsService, UserService {
         Optional<User> optionalUser = userDao.findById(userId);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            BeanUtils.copyProperties(userDto, user, "password"); // ignore password?
+            BeanUtils.copyProperties(userDto, user, "password");
             User savedUser = userDao.save(user);
             return new UserResponse(savedUser);
         } else throw new NotFoundException("User");
@@ -91,7 +91,7 @@ public class UserServiceImpl implements UserDetailsService, UserService {
                 .firstName(userDto.getFirstName())
                 .lastName(userDto.getLastName())
                 .username(userDto.getUsername())
-                .password(bcryptEncoder.encode(userDto.getPassword()))
+                .password(bcryptEncoder.encode(new String(userDto.getPassword())).toCharArray())
                 .dateOfBirth(userDto.getDateOfBirth())
                 .image(userDto.getImage())
                 .build();

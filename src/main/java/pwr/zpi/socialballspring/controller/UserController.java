@@ -19,17 +19,17 @@ public class UserController {
     private UserService userService;
 
     @PostMapping
-    public ResponseEntity<UserResponse> saveUser(@RequestBody UserDto user){
+    public ResponseEntity<UserResponse> saveUser(@RequestBody UserDto user) {
         return new ResponseEntity<>(userService.save(user), HttpStatus.OK);
     }
 
     @GetMapping
-    public ResponseEntity<List<UserResponse>> listUser(){
+    public ResponseEntity<List<UserResponse>> listUser() {
         return new ResponseEntity<>(userService.findAll(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponse> getOne(@PathVariable long id){
+    public ResponseEntity<UserResponse> getOne(@PathVariable long id) {
         return new ResponseEntity<>(userService.findById(id), HttpStatus.OK);
     }
 

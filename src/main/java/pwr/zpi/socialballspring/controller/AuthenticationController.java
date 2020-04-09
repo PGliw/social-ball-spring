@@ -7,9 +7,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import pwr.zpi.socialballspring.dto.Response.LoginResopnse;
-import pwr.zpi.socialballspring.dto.LoginUserDto;
 import pwr.zpi.socialballspring.config.JwtTokenUtil;
+import pwr.zpi.socialballspring.dto.LoginUserDto;
+import pwr.zpi.socialballspring.dto.Response.LoginResopnse;
 import pwr.zpi.socialballspring.service.MyUserDetailsService;
 
 @CrossOrigin(origins = "*", maxAge = 3600)

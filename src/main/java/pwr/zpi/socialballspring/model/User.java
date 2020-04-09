@@ -2,10 +2,8 @@ package pwr.zpi.socialballspring.model;
 
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Tolerate;
-import pwr.zpi.socialballspring.model.MatchMember;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -18,7 +16,9 @@ import java.util.List;
 @Entity
 public class User {
     @Tolerate
-    public User() {} // no args constructor is required by Hibernate
+    public User() {
+    } // no args constructor is required by Hibernate
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -30,7 +30,7 @@ public class User {
     @NotNull
     private LocalDate dateOfBirth;
     @NotNull
-    private String password;
+    private char[] password;
     @NotNull
     @Column(unique = true)
     private String email;
