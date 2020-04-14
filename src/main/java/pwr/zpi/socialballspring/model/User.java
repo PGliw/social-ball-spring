@@ -35,6 +35,15 @@ public class User {
     @Column(unique = true)
     private String email;
     private String username;
+
+
     @OneToMany(targetEntity = MatchMember.class, mappedBy = "user")
     private List<MatchMember> appearancesAsMatchMember;
+    @OneToMany(targetEntity = Acquaintance.class, mappedBy = "requestSender")
+    private List<Acquaintance> acquaintanceRequestsSent;
+    @OneToMany(targetEntity = Acquaintance.class, mappedBy = "requestReceiver")
+    private List<Acquaintance> acquaintanceRequestsReceived;
+    @OneToMany(targetEntity = FavouritePosition.class, mappedBy = "user")
+    private List<FavouritePosition> favouritePositions;
 }
+
