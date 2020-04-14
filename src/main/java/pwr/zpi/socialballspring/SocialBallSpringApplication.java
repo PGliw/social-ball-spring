@@ -1,4 +1,4 @@
-package pwr.zpi.socialballspring.model;
+package pwr.zpi.socialballspring;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
