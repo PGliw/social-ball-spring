@@ -36,6 +36,7 @@ public class User {
     private String email;
     private String username;
 
+
     @OneToMany(targetEntity = MatchMember.class, mappedBy = "user")
     private List<MatchMember> appearancesAsMatchMember;
     @OneToMany(targetEntity = Acquaintance.class, mappedBy = "requestSender")
@@ -45,3 +46,4 @@ public class User {
     @OneToMany(targetEntity = FavouritePosition.class, mappedBy = "user")
     private List<FavouritePosition> favouritePositions;
 }
+

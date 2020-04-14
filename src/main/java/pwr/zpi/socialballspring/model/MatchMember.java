@@ -15,6 +15,7 @@ public class MatchMember {
     private Long id;
     private boolean isConfirmed;
 
+
     @ManyToOne()
     private User user;
     @ManyToOne()
@@ -32,3 +33,4 @@ public class MatchMember {
     @OneToMany(targetEntity = Event.class, mappedBy = "matchMember")
     private List<Event> eventsInvolvingMatchMember;
 }
+

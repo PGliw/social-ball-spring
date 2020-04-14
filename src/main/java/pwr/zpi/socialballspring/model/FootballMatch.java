@@ -1,10 +1,10 @@
 package pwr.zpi.socialballspring.model;
 
 import lombok.Data;
-
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
+
 
 @Data
 @Entity
@@ -14,6 +14,7 @@ public class FootballMatch {
     private Long id;
     private LocalDate beginningTime;
     private LocalDate endingTime;
+
 
     @ManyToOne()
     private MatchMember matchMember;
@@ -26,3 +27,5 @@ public class FootballMatch {
     @OneToMany(targetEntity = Team.class, mappedBy = "footballMatch")
     private List<Team> teamsInvolved;
 }
+
+
