@@ -10,6 +10,7 @@ import pwr.zpi.socialballspring.model.FootballMatch;
 import pwr.zpi.socialballspring.model.User;
 import pwr.zpi.socialballspring.repository.FootballMatchDao;
 import pwr.zpi.socialballspring.repository.UserDao;
+import pwr.zpi.socialballspring.util.dateUtils;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -48,22 +49,14 @@ public class FootballMatchServiceImpl implements FootballMatchService{
     public FootballMatchResponse update(FootballMatchDto footballMatchDto, long id) {
         Optional<FootballMatch> optionalFootballMatch = footballMatchDao.findById(id);
         if (optionalFootballMatch.isPresent()) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-            LocalDateTime beginningTime = null;
-            if(footballMatchDto.getBeginningTime() != null){
-                beginningTime = LocalDateTime.parse(footballMatchDto.getBeginningTime(), formatter);
-            }
-            LocalDateTime endingTime = null;
-            if(footballMatchDto.getEndingTime() != null){
-                endingTime = LocalDateTime.parse(footballMatchDto.getEndingTime(), formatter);
-            }
+            LocalDateTime beginningTime = dateUtils.convertFromString(footballMatchDto.getBeginningTime());
+            LocalDateTime endingTime = endingTime = dateUtils.convertFromString(footballMatchDto.getEndingTime());
             FootballMatch footballMatch = FootballMatch.builder()
                     .description(footballMatchDto.getDescription())
                     .beginningTime(beginningTime)
                     .endingTime(endingTime)
                     .id(id)
                     .build();
-            //BeanUtils.copyProperties(footballMatchDto, footballMatch);
             FootballMatch savedFootballMatch = footballMatchDao.save(footballMatch);
             return new FootballMatchResponse(savedFootballMatch);
         } else throw new NotFoundException("FootballMatch");
@@ -71,15 +64,8 @@ public class FootballMatchServiceImpl implements FootballMatchService{
 
     @Override
     public FootballMatchResponse save(FootballMatchDto footballMatchDto) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        LocalDateTime beginningTime = null;
-        if(footballMatchDto.getBeginningTime() != null){
-            beginningTime = LocalDateTime.parse(footballMatchDto.getBeginningTime(), formatter);
-        }
-        LocalDateTime endingTime = null;
-        if(footballMatchDto.getEndingTime() != null){
-            endingTime = LocalDateTime.parse(footballMatchDto.getEndingTime(), formatter);
-        }
+        LocalDateTime beginningTime = dateUtils.convertFromString(footballMatchDto.getBeginningTime());
+        LocalDateTime endingTime = dateUtils.convertFromString(footballMatchDto.getEndingTime());
         FootballMatch newFootballMach = FootballMatch.builder()
                 .description(footballMatchDto.getDescription())
                 .beginningTime(beginningTime)
@@ -94,7 +80,6 @@ public class FootballMatchServiceImpl implements FootballMatchService{
         else{
             throw new NotFoundException("organizerId");
         }
-        // save the user and return UserResponse
         return new FootballMatchResponse(footballMatchDao.save(newFootballMach));
     }
 
