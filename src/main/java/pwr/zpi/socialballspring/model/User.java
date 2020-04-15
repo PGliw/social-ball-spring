@@ -37,6 +37,8 @@ public class User {
     private String username;
 
 
+    @OneToMany(targetEntity = FootballMatch.class, mappedBy = "organizer")
+    private List<FootballMatch> appearancesAsMatchOrganizer;
     @OneToMany(targetEntity = MatchMember.class, mappedBy = "user")
     private List<MatchMember> appearancesAsMatchMember;
     @OneToMany(targetEntity = Acquaintance.class, mappedBy = "requestSender")

@@ -9,7 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import pwr.zpi.socialballspring.config.JwtTokenUtil;
 import pwr.zpi.socialballspring.dto.LoginUserDto;
-import pwr.zpi.socialballspring.dto.Response.LoginResopnse;
+import pwr.zpi.socialballspring.dto.Response.LoginResponse;
 import pwr.zpi.socialballspring.service.MyUserDetailsService;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -28,12 +28,12 @@ public class AuthenticationController {
 
 
     @RequestMapping(value = "/generate-token", method = RequestMethod.POST)
-    public ResponseEntity<LoginResopnse> login(@RequestBody LoginUserDto loginUserDto) throws AuthenticationException {
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginUserDto loginUserDto) throws AuthenticationException {
 
         //authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginUser.getEmail(), loginUser.getPassword()));
         final UserDetails userDetails = myUserDetailsService.loadUserByUsername(loginUserDto.getEmail());
         final String token = jwtTokenUtil.generateToken(userDetails);
-        return new ResponseEntity<>(new LoginResopnse(token, userDetails.getUsername()), HttpStatus.OK);
+        return new ResponseEntity<>(new LoginResponse(token, userDetails.getUsername()), HttpStatus.OK);
     }
 
 }

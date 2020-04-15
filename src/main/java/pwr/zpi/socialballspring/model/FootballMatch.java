@@ -1,21 +1,27 @@
 package pwr.zpi.socialballspring.model;
 
+import lombok.Builder;
 import lombok.Data;
-import javax.persistence.*;
-import java.time.LocalDate;
-import java.util.List;
+import lombok.experimental.Tolerate;
 
+import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Entity
+@Builder
 public class FootballMatch {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private LocalDate beginningTime;
-    private LocalDate endingTime;
+    private LocalDateTime beginningTime;
+    private LocalDateTime endingTime;
+    private String description;
 
 
+    @ManyToOne()
+    private User organizer;
     @ManyToOne()
     private MatchMember matchMember;
     @ManyToOne()
@@ -26,6 +32,10 @@ public class FootballMatch {
     private List<Event> eventsInvolvingMatch;
     @OneToMany(targetEntity = Team.class, mappedBy = "footballMatch")
     private List<Team> teamsInvolved;
+
+    @Tolerate
+    public FootballMatch() {
+    }
 }
 
 
