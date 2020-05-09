@@ -2,9 +2,6 @@ package pwr.zpi.socialballspring.dto.Response;
 
 import lombok.Data;
 import pwr.zpi.socialballspring.model.FootballMatch;
-import pwr.zpi.socialballspring.model.User;
-
-import java.time.LocalDate;
 
 @Data
 public class FootballMatchResponse {
@@ -13,6 +10,7 @@ public class FootballMatchResponse {
     private String endingTime;
     private String description;
     private Long organizerId;
+    private Long pitchId;
 
     public FootballMatchResponse(FootballMatch footballMatch){
         this.id = footballMatch.getId();
@@ -25,6 +23,9 @@ public class FootballMatchResponse {
         this.description = footballMatch.getDescription();
         if(footballMatch.getOrganizer() != null) {
             this.organizerId = footballMatch.getOrganizer().getId();
+        }
+        if(footballMatch.getFootballPitch() != null){
+            this.pitchId = footballMatch.getFootballPitch().getId();
         }
     }
 }
