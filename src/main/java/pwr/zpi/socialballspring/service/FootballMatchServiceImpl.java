@@ -8,10 +8,10 @@ import pwr.zpi.socialballspring.dto.Response.FootballMatchResponse;
 import pwr.zpi.socialballspring.exception.NotFoundException;
 import pwr.zpi.socialballspring.model.FootballMatch;
 import pwr.zpi.socialballspring.model.FootballPitch;
-import pwr.zpi.socialballspring.model.User;
+import pwr.zpi.socialballspring.model.MatchMember;
 import pwr.zpi.socialballspring.repository.FootballMatchDao;
 import pwr.zpi.socialballspring.repository.FootballPitchDao;
-import pwr.zpi.socialballspring.repository.UserDao;
+import pwr.zpi.socialballspring.repository.MatchMemberDao;
 import pwr.zpi.socialballspring.util.dateUtils;
 
 import java.time.LocalDateTime;
@@ -30,11 +30,12 @@ public class FootballMatchServiceImpl implements FootballMatchService{
     FootballPitchDao footballPitchDao;
 
     @Autowired
-    IIdentityManager identityManager;
+    MatchMemberDao matchMemberDao;
 
     @Autowired
-    UserDao userDao;
+    IIdentityManager identityManager;
 
+    @Override
     public List<FootballMatchResponse> findAll() {
         List<FootballMatch> list = new ArrayList<>();
         footballMatchDao.findAll().iterator().forEachRemaining(list::add);
@@ -62,6 +63,10 @@ public class FootballMatchServiceImpl implements FootballMatchService{
             if(footballMatchDto.getPitchId() != null){
                 footballPitch = footballPitchDao.findById(footballMatchDto.getPitchId()).get();
             }
+            MatchMember matchMember = null;
+            if(footballMatchDto.getMatchMemberId() != null){
+                matchMember = matchMemberDao.findById(footballMatchDto.getMatchMemberId()).get();
+            }
             FootballMatch footballMatch = FootballMatch.builder()
                     .description(footballMatchDto.getDescription())
                     .beginningTime(beginningTime)
@@ -69,6 +74,7 @@ public class FootballMatchServiceImpl implements FootballMatchService{
                     .id(id)
                     .organizer(identityManager.getCurrentUser())
                     .footballPitch(footballPitch)
+                    .matchMember(matchMember)
                     .build();
             FootballMatch savedFootballMatch = footballMatchDao.save(footballMatch);
             return new FootballMatchResponse(savedFootballMatch);

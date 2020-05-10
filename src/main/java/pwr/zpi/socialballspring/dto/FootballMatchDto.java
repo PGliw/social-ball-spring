@@ -10,4 +10,5 @@ public class FootballMatchDto {
     private String description;
     private Long organizerId;
     private Long pitchId;
+    private Long matchMemberId;
 }
