@@ -17,5 +17,5 @@ public interface UserService {
 
     UserResponse findById(long id);
 
-    UserResponse update(UserDto userDto);
+    UserResponse update(UserDto userDto, long id);
 }

@@ -1,7 +1,9 @@
 package pwr.zpi.socialballspring.model;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Tolerate;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -10,6 +12,7 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
+@Builder
 @Table(
         uniqueConstraints = @UniqueConstraint(columnNames = {"name", "side"})
 )
@@ -25,4 +28,8 @@ public class Position {
     private List<FavouritePosition> relatedFavouritePositions;
     @OneToMany(targetEntity = MatchMember.class, mappedBy = "position")
     private List<MatchMember> relatedMatchMembers;
+
+    @Tolerate
+    public Position(){
+    }
 }

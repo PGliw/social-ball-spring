@@ -1,7 +1,9 @@
 package pwr.zpi.socialballspring.model;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Tolerate;
 
 import javax.persistence.*;
 import java.util.List;
@@ -9,6 +11,7 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
+@Builder
 public class MatchMember {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -32,5 +35,9 @@ public class MatchMember {
     private List<Comment> matchCommentsAdded;
     @OneToMany(targetEntity = Event.class, mappedBy = "matchMember")
     private List<Event> eventsInvolvingMatchMember;
+
+    @Tolerate
+    public MatchMember(){
+    }
 }
 

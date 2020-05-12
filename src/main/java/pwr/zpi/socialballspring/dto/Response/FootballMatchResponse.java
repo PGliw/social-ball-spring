@@ -11,6 +11,7 @@ public class FootballMatchResponse {
     private String description;
     private Long organizerId;
     private Long pitchId;
+    private Long matchMemberId;
 
     public FootballMatchResponse(FootballMatch footballMatch){
         this.id = footballMatch.getId();
@@ -26,6 +27,9 @@ public class FootballMatchResponse {
         }
         if(footballMatch.getFootballPitch() != null){
             this.pitchId = footballMatch.getFootballPitch().getId();
+        }
+        if(footballMatch.getMatchMember() != null){
+            this.matchMemberId = footballMatch.getMatchMember().getId();
         }
     }
 }

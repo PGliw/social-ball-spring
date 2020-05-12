@@ -66,12 +66,19 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     }
 
     @Override
-    public UserResponse update(UserDto userDto) {
-        long userId = userDto.getId();
-        Optional<User> optionalUser = userDao.findById(userId);
+    public UserResponse update(UserDto userDto, long id) {
+        Optional<User> optionalUser = userDao.findById(id);
         if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            BeanUtils.copyProperties(userDto, user, "password");
+            User user = User.builder()
+                    .email(userDto.getEmail())
+                    .firstName(userDto.getFirstName())
+                    .lastName(userDto.getLastName())
+                    .username(userDto.getUsername())
+                    .password(bcryptEncoder.encode(new String(userDto.getPassword())).toCharArray())
+                    .dateOfBirth(userDto.getDateOfBirth())
+                    .image(userDto.getImage())
+                    .id(id)
+                    .build();
             User savedUser = userDao.save(user);
             return new UserResponse(savedUser);
         } else throw new NotFoundException("User");

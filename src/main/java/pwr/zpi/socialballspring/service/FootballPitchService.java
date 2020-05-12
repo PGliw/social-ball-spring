@@ -6,7 +6,7 @@ import pwr.zpi.socialballspring.dto.Response.FootballPitchResponse;
 import java.util.List;
 
 public interface FootballPitchService {
-    FootballPitchResponse save(FootballPitchDto footballMatch);
+    FootballPitchResponse save(FootballPitchDto footballPitch);
 
     List<FootballPitchResponse> findAll();
 
