@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pwr.zpi.socialballspring.config.IIdentityManager;
 import pwr.zpi.socialballspring.dto.Response.UserResponse;
 import pwr.zpi.socialballspring.dto.UserDto;
 import pwr.zpi.socialballspring.service.UserService;
@@ -18,6 +19,9 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private IIdentityManager identityManager;
+
     @PostMapping
     public ResponseEntity<UserResponse> saveUser(@RequestBody UserDto user) {
         return new ResponseEntity<>(userService.save(user), HttpStatus.OK);
@@ -31,6 +35,11 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getOne(@PathVariable long id) {
         return new ResponseEntity<>(userService.findById(id), HttpStatus.OK);
+    }
+
+    @PutMapping
+    public ResponseEntity<UserResponse> update(@RequestBody UserDto userDto) {
+        return new ResponseEntity<>(userService.update(userDto, identityManager.getCurrentUser().getId()), HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
