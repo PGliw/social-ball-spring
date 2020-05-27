@@ -9,7 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import pwr.zpi.socialballspring.service.MyUserDetailsService;
+import pwr.zpi.socialballspring.service.impl.MyUserDetailsService;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import pwr.zpi.socialballspring.config.JwtTokenUtil;
 import pwr.zpi.socialballspring.dto.LoginUserDto;
 import pwr.zpi.socialballspring.dto.Response.LoginResponse;
-import pwr.zpi.socialballspring.service.MyUserDetailsService;
+import pwr.zpi.socialballspring.service.impl.MyUserDetailsService;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController

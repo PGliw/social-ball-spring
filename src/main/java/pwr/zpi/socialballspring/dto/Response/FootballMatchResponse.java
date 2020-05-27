@@ -2,6 +2,11 @@ package pwr.zpi.socialballspring.dto.Response;
 
 import lombok.Data;
 import pwr.zpi.socialballspring.model.FootballMatch;
+import pwr.zpi.socialballspring.model.FootballPitch;
+import pwr.zpi.socialballspring.model.Team;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 public class FootballMatchResponse {
@@ -10,8 +15,8 @@ public class FootballMatchResponse {
     private String endingTime;
     private String description;
     private Long organizerId;
-    private Long pitchId;
-    private Long matchMemberId;
+    private FootballPitchResponse pitch;
+    private List<TeamResponse> teams;
 
     public FootballMatchResponse(FootballMatch footballMatch){
         this.id = footballMatch.getId();
@@ -26,10 +31,10 @@ public class FootballMatchResponse {
             this.organizerId = footballMatch.getOrganizer().getId();
         }
         if(footballMatch.getFootballPitch() != null){
-            this.pitchId = footballMatch.getFootballPitch().getId();
+            this.pitch = new FootballPitchResponse(footballMatch.getFootballPitch());
         }
-        if(footballMatch.getMatchMember() != null){
-            this.matchMemberId = footballMatch.getMatchMember().getId();
+        if(footballMatch.getMatchMembers() != null){
+            this.teams = footballMatch.getTeamsInvolved().stream().map(TeamResponse::new).collect(Collectors.toList());
         }
     }
 }

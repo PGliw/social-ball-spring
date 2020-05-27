@@ -12,7 +12,7 @@ import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/team")
+@RequestMapping("/teams")
 public class TeamController {
     @Autowired
     private TeamService teamService;

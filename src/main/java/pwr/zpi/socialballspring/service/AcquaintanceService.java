@@ -5,8 +5,8 @@ import pwr.zpi.socialballspring.dto.Response.AcquaitanceResponse;
 
 import java.util.List;
 
-public interface AcquaitanceService {
-    AcquaitanceResponse save(AcquaitanceDto acquaitance);
+public interface AcquaintanceService {
+    AcquaitanceResponse save(AcquaitanceDto acquaintance);
 
     List<AcquaitanceResponse> findAll();
 
@@ -14,5 +14,5 @@ public interface AcquaitanceService {
 
     AcquaitanceResponse findById(long id);
 
-    AcquaitanceResponse update(AcquaitanceDto acquaitance, long id);
+    AcquaitanceResponse update(AcquaitanceDto acquaintance, long id);
 }

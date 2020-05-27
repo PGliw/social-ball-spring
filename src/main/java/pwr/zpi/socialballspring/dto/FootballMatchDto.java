@@ -8,7 +8,5 @@ public class FootballMatchDto {
     private String beginningTime;
     private String endingTime;
     private String description;
-    private Long organizerId;
     private Long pitchId;
-    private Long matchMemberId;
 }

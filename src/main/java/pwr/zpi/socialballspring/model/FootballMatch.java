@@ -20,11 +20,11 @@ public class FootballMatch {
     private String description;
 
 
-    @ManyToOne()
+    @ManyToOne
     private User organizer;
-    @ManyToOne()
-    private MatchMember matchMember;
-    @ManyToOne()
+    @OneToMany(targetEntity = MatchMember.class, mappedBy = "footballMatch")
+    private List<MatchMember> matchMembers;
+    @ManyToOne
     private FootballPitch footballPitch;
     @OneToMany(targetEntity = Comment.class, mappedBy = "relatedMatch")
     private List<Comment> relatedComments;

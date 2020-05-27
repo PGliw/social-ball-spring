@@ -12,7 +12,7 @@ import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/event")
+@RequestMapping("/events")
 public class EventController {
     @Autowired
     private EventService eventService;

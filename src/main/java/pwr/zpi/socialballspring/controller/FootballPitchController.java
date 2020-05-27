@@ -12,7 +12,7 @@ import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/footballPitch")
+@RequestMapping("/footballPitches")
 public class FootballPitchController {
     @Autowired
     private FootballPitchService footballPitchService;

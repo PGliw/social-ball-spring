@@ -12,7 +12,7 @@ import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/matchMember")
+@RequestMapping("/matchMemberes")
 public class MatchMemberController {
     @Autowired
     private MatchMemberService matchMemberService;

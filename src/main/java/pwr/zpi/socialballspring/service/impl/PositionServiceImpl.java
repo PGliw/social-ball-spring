@@ -1,4 +1,4 @@
-package pwr.zpi.socialballspring.service;
+package pwr.zpi.socialballspring.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -7,6 +7,7 @@ import pwr.zpi.socialballspring.dto.Response.PositionResponse;
 import pwr.zpi.socialballspring.exception.NotFoundException;
 import pwr.zpi.socialballspring.model.Position;
 import pwr.zpi.socialballspring.repository.PositionDao;
+import pwr.zpi.socialballspring.service.PositionService;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,7 +1,9 @@
 package pwr.zpi.socialballspring.service;
 
+import pwr.zpi.socialballspring.dto.MatchMemberDto;
 import pwr.zpi.socialballspring.dto.TeamDto;
 import pwr.zpi.socialballspring.dto.Response.TeamResponse;
+import pwr.zpi.socialballspring.model.MatchMember;
 
 import java.util.List;
 

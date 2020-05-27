@@ -12,7 +12,7 @@ import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/comment")
+@RequestMapping("/comments")
 public class CommentController {
     @Autowired
     private CommentService commentService;

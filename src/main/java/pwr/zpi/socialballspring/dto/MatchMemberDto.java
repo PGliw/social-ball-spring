@@ -9,4 +9,5 @@ public class MatchMemberDto {
     private Long userId;
     private Long positionId;
     private Long teamId;
+    private Long footballMatchId;
 }

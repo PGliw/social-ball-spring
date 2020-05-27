@@ -1,4 +1,4 @@
-package pwr.zpi.socialballspring.service;
+package pwr.zpi.socialballspring.service.impl;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +14,7 @@ import pwr.zpi.socialballspring.exception.DuplicateException;
 import pwr.zpi.socialballspring.exception.NotFoundException;
 import pwr.zpi.socialballspring.model.User;
 import pwr.zpi.socialballspring.repository.UserDao;
+import pwr.zpi.socialballspring.service.UserService;
 
 import java.util.ArrayList;
 import java.util.Arrays;

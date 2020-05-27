@@ -1,4 +1,4 @@
-package pwr.zpi.socialballspring.service;
+package pwr.zpi.socialballspring.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,6 +9,7 @@ import pwr.zpi.socialballspring.model.*;
 import pwr.zpi.socialballspring.repository.CommentDao;
 import pwr.zpi.socialballspring.repository.FootballMatchDao;
 import pwr.zpi.socialballspring.repository.MatchMemberDao;
+import pwr.zpi.socialballspring.service.CommentService;
 import pwr.zpi.socialballspring.util.dateUtils;
 
 import java.time.LocalDateTime;
@@ -18,7 +19,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service(value = "commentService")
-public class CommentServiceImpl implements  CommentService{
+public class CommentServiceImpl implements CommentService {
     @Autowired
     CommentDao commentDao;
 

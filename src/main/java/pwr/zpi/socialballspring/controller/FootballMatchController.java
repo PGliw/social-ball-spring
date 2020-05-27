@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pwr.zpi.socialballspring.config.IIdentityManager;
 import pwr.zpi.socialballspring.dto.FootballMatchDto;
 import pwr.zpi.socialballspring.dto.Response.FootballMatchResponse;
 import pwr.zpi.socialballspring.service.FootballMatchService;
@@ -12,10 +13,13 @@ import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/footballMatch")
+@RequestMapping("/footballMatches")
 public class FootballMatchController {
     @Autowired
     private FootballMatchService footballMatchService;
+
+    @Autowired
+    private IIdentityManager identityManager;
 
     @PostMapping
     public ResponseEntity<FootballMatchResponse> saveFootballMatch(@RequestBody FootballMatchDto footballMatch) {

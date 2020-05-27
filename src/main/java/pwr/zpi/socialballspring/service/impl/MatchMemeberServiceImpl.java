@@ -1,4 +1,4 @@
-package pwr.zpi.socialballspring.service;
+package pwr.zpi.socialballspring.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -7,6 +7,7 @@ import pwr.zpi.socialballspring.dto.Response.MatchMemberResponse;
 import pwr.zpi.socialballspring.exception.NotFoundException;
 import pwr.zpi.socialballspring.model.*;
 import pwr.zpi.socialballspring.repository.*;
+import pwr.zpi.socialballspring.service.MatchMemberService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service(value = "matchMemberService")
-public class MatchMemeberServiceImpl implements MatchMemberService{
+public class MatchMemeberServiceImpl implements MatchMemberService {
     @Autowired
     MatchMemberDao matchMemberDao;
 
@@ -26,6 +27,9 @@ public class MatchMemeberServiceImpl implements MatchMemberService{
 
     @Autowired
     UserDao userDao;
+
+    @Autowired
+    FootballMatchDao footballMatchDao;
 
     @Override
     public List<MatchMemberResponse> findAll() {
@@ -61,8 +65,14 @@ public class MatchMemeberServiceImpl implements MatchMemberService{
             if(matchMemberDto.getPositionId() != null){
                 position = positionDao.findById(matchMemberDto.getPositionId()).get();
             }
+            FootballMatch footballMatch = null;
+            if (matchMemberDto.getFootballMatchId() != null) {
+                footballMatch = footballMatchDao.findById(matchMemberDto.getFootballMatchId()).orElseThrow(() -> new NotFoundException("Football match"));
+            }
+
             MatchMember matchMember = MatchMember.builder()
                     .position(position)
+                    .footballMatch(footballMatch)
                     .team(team)
                     .user(user)
                     .id(id)
@@ -87,9 +97,14 @@ public class MatchMemeberServiceImpl implements MatchMemberService{
         if(matchMemberDto.getPositionId() != null){
             position = positionDao.findById(matchMemberDto.getPositionId()).get();
         }
+        FootballMatch footballMatch = null;
+        if (matchMemberDto.getFootballMatchId() != null) {
+            footballMatch = footballMatchDao.findById(matchMemberDto.getFootballMatchId()).orElseThrow(() -> new NotFoundException("Football match"));
+        }
         MatchMember matchMember = MatchMember.builder()
                 .position(position)
                 .team(team)
+                .footballMatch(footballMatch)
                 .user(user)
                 .isConfirmed(matchMemberDto.isConfirmed())
                 .build();

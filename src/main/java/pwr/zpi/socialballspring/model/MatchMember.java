@@ -19,14 +19,14 @@ public class MatchMember {
     private boolean isConfirmed;
 
 
-    @ManyToOne()
+    @ManyToOne
     private User user;
-    @ManyToOne()
+    @ManyToOne
     private Position position;
-    @ManyToOne()
+    @ManyToOne
     private Team team;
-    @OneToMany(targetEntity = FootballMatch.class, mappedBy = "matchMember")
-    private List<FootballMatch> appearancesOnMatches;
+    @ManyToOne
+    private FootballMatch footballMatch;
     @OneToMany(targetEntity = Rating.class, mappedBy = "sender")
     private List<Rating> ratingsSent;
     @OneToMany(targetEntity = Rating.class, mappedBy = "receiver")
