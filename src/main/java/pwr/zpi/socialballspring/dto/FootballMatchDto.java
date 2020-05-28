@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class FootballMatchDto {
     private Long id;
+    private String title;
     private String beginningTime;
     private String endingTime;
     private String description;

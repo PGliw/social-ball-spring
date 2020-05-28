@@ -60,6 +60,7 @@ public class FootballMatchServiceImpl implements FootballMatchService {
                 footballPitch = footballPitchDao.findById(footballMatchDto.getPitchId()).get();
             }
             FootballMatch footballMatch = FootballMatch.builder()
+                    .title(footballMatchDto.getTitle())
                     .description(footballMatchDto.getDescription())
                     .beginningTime(beginningTime)
                     .endingTime(endingTime)
@@ -81,6 +82,7 @@ public class FootballMatchServiceImpl implements FootballMatchService {
             footballPitch = footballPitchDao.findById(footballMatchDto.getPitchId()).get();
         }
         FootballMatch newFootballMatch = FootballMatch.builder()
+                .title(footballMatchDto.getTitle())
                 .description(footballMatchDto.getDescription())
                 .beginningTime(beginningTime)
                 .endingTime(endingTime)

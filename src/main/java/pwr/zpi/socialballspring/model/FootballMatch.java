@@ -17,8 +17,8 @@ public class FootballMatch {
     private Long id;
     private LocalDateTime beginningTime;
     private LocalDateTime endingTime;
+    private String title;
     private String description;
-
 
     @ManyToOne
     private User organizer;
