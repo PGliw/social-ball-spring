@@ -17,6 +17,7 @@ public class Team {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private int membersCount;
+    private String name;
     private String shirtColours;
 
     @ManyToOne()

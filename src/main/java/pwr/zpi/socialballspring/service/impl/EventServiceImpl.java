@@ -1,4 +1,4 @@
-package pwr.zpi.socialballspring.service;
+package pwr.zpi.socialballspring.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,6 +11,7 @@ import pwr.zpi.socialballspring.model.MatchMember;
 import pwr.zpi.socialballspring.repository.EventDao;
 import pwr.zpi.socialballspring.repository.FootballMatchDao;
 import pwr.zpi.socialballspring.repository.MatchMemberDao;
+import pwr.zpi.socialballspring.service.EventService;
 
 import java.util.ArrayList;
 import java.util.List;

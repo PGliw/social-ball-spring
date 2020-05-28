@@ -1,7 +1,9 @@
 package pwr.zpi.socialballspring.dto.Response;
 
+import lombok.Data;
 import pwr.zpi.socialballspring.model.Position;
 
+@Data
 public class PositionResponse {
     private Long id;
     private String name;

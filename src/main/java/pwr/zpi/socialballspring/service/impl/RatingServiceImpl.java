@@ -1,4 +1,4 @@
-package pwr.zpi.socialballspring.service;
+package pwr.zpi.socialballspring.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,6 +9,7 @@ import pwr.zpi.socialballspring.model.MatchMember;
 import pwr.zpi.socialballspring.model.Rating;
 import pwr.zpi.socialballspring.repository.MatchMemberDao;
 import pwr.zpi.socialballspring.repository.RatingDao;
+import pwr.zpi.socialballspring.service.RatingService;
 
 import java.util.ArrayList;
 import java.util.List;

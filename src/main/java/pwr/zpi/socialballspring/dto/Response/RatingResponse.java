@@ -1,7 +1,9 @@
 package pwr.zpi.socialballspring.dto.Response;
 
+import lombok.Data;
 import pwr.zpi.socialballspring.model.Rating;
 
+@Data
 public class RatingResponse {
     private Long id;
     private Integer ratingMark;

@@ -1,4 +1,4 @@
-package pwr.zpi.socialballspring.service;
+package pwr.zpi.socialballspring.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,6 +9,7 @@ import pwr.zpi.socialballspring.model.Acquaintance;
 import pwr.zpi.socialballspring.model.User;
 import pwr.zpi.socialballspring.repository.AcquaitanceDao;
 import pwr.zpi.socialballspring.repository.UserDao;
+import pwr.zpi.socialballspring.service.AcquaintanceService;
 import pwr.zpi.socialballspring.util.dateUtils;
 
 import java.time.LocalDateTime;
@@ -18,7 +19,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service(value = "acquitanceService")
-public class AcquaitanceServiceImpl implements AcquaitanceService{
+public class AcquaintanceServiceImpl implements AcquaintanceService {
     @Autowired
     AcquaitanceDao acquaitanceDao;
 

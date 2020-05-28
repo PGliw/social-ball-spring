@@ -12,7 +12,7 @@ import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/favouritePosition")
+@RequestMapping("/favouritePositions")
 public class FavouritePositionController {
     @Autowired
     private FavouritePositionService favouritePositionService;
