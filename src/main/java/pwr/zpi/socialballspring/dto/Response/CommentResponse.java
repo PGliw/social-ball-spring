@@ -22,4 +22,24 @@ public class CommentResponse {
             this.relatedMatchMemberId = comment.getRelatedMatchMember().getId();
         }
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getDateOfAddition() {
+        return dateOfAddition;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public Long getRelatedMatchId() {
+        return relatedMatchId;
+    }
+
+    public Long getRelatedMatchMemberId() {
+        return relatedMatchMemberId;
+    }
 }

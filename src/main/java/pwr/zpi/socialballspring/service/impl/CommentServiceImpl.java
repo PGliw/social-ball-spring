@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service(value = "commentService")
 public class CommentServiceImpl implements CommentService {
@@ -30,10 +31,17 @@ public class CommentServiceImpl implements CommentService {
     FootballMatchDao footballMatchDao;
 
     @Override
-    public List<CommentResponse> findAll() {
+    public List<CommentResponse> findAll(Optional<Long> matchId, Optional<Long> userId) {
         List<Comment> list = new ArrayList<>();
         commentDao.findAll().iterator().forEachRemaining(list::add);
-        return list.stream().map(CommentResponse::new).collect(Collectors.toList());
+        Stream<Comment> comments = list.stream();
+        if(matchId.isPresent()){
+            comments = comments.filter(c -> c.getRelatedMatch().getId().equals(matchId.get()));
+        }
+        if(userId.isPresent()){
+            comments = comments.filter(c -> c.getRelatedMatchMember().getUser().getId().equals(userId.get()));
+        }
+        return comments.map(CommentResponse::new).collect(Collectors.toList());
     }
 
     @Override

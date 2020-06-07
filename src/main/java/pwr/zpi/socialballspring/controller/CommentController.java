@@ -9,6 +9,7 @@ import pwr.zpi.socialballspring.dto.Response.CommentResponse;
 import pwr.zpi.socialballspring.service.CommentService;
 
 import java.util.List;
+import java.util.Optional;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -23,8 +24,8 @@ public class CommentController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CommentResponse>> listComment() {
-        return new ResponseEntity<>(commentService.findAll(), HttpStatus.OK);
+    public ResponseEntity<List<CommentResponse>> listComment(@RequestParam Optional<Long> matchId, @RequestParam Optional<Long> userId) {
+        return new ResponseEntity<>(commentService.findAll(matchId, userId), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
