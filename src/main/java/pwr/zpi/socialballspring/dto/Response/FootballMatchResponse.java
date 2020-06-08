@@ -16,6 +16,7 @@ public class FootballMatchResponse {
     private UserResponse organizer;
     private FootballPitchResponse pitch;
     private List<TeamResponse> teams;
+    private boolean ifFinished;
 
     public FootballMatchResponse(FootballMatch footballMatch) {
         this.id = footballMatch.getId();

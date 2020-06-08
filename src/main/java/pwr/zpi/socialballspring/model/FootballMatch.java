@@ -19,6 +19,7 @@ public class FootballMatch {
     private LocalDateTime endingTime;
     private String title;
     private String description;
+    private Boolean ifFinished;
 
     @ManyToOne
     private User organizer;

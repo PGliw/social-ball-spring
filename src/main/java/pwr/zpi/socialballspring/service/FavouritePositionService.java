@@ -8,7 +8,7 @@ import java.util.List;
 public interface FavouritePositionService {
     FavouritePositionResponse save(FavouritePositionDto favouritePosition);
 
-    List<FavouritePositionResponse> findAll();
+    List<FavouritePositionResponse> findAll(long id);
 
     void delete(long id);
 

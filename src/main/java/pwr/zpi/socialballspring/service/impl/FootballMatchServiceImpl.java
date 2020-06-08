@@ -64,6 +64,7 @@ public class FootballMatchServiceImpl implements FootballMatchService {
                     .description(footballMatchDto.getDescription())
                     .beginningTime(beginningTime)
                     .endingTime(endingTime)
+                    .ifFinished(footballMatchDto.getIfFinished())
                     .id(id)
                     .organizer(identityManager.getCurrentUser())
                     .footballPitch(footballPitch)
@@ -86,6 +87,7 @@ public class FootballMatchServiceImpl implements FootballMatchService {
                 .description(footballMatchDto.getDescription())
                 .beginningTime(beginningTime)
                 .endingTime(endingTime)
+                .ifFinished(false)
                 .organizer(identityManager.getCurrentUser())
                 .footballPitch(footballPitch)
                 .build();

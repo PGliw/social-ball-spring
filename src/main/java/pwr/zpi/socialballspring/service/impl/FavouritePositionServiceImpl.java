@@ -2,6 +2,7 @@ package pwr.zpi.socialballspring.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import pwr.zpi.socialballspring.config.IIdentityManager;
 import pwr.zpi.socialballspring.dto.FavouritePositionDto;
 import pwr.zpi.socialballspring.dto.Response.FavouritePositionResponse;
 import pwr.zpi.socialballspring.exception.NotFoundException;
@@ -28,10 +29,10 @@ public class FavouritePositionServiceImpl implements FavouritePositionService {
     PositionDao positionDao;
 
     @Override
-    public List<FavouritePositionResponse> findAll() {
+    public List<FavouritePositionResponse> findAll(long id) {
         List<FavouritePosition> list = new ArrayList<>();
         favouritePositionDao.findAll().iterator().forEachRemaining(list::add);
-        return list.stream().map(FavouritePositionResponse::new).collect(Collectors.toList());
+        return list.stream().filter(f -> f.getUser().getId().equals(id)).map(FavouritePositionResponse::new).collect(Collectors.toList());
     }
 
     @Override

@@ -10,4 +10,5 @@ public class FootballMatchDto {
     private String endingTime;
     private String description;
     private Long pitchId;
+    private Boolean ifFinished;
 }

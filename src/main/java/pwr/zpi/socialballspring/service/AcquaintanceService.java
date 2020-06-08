@@ -8,7 +8,7 @@ import java.util.List;
 public interface AcquaintanceService {
     AcquaitanceResponse save(AcquaitanceDto acquaintance);
 
-    List<AcquaitanceResponse> findAll();
+    List<AcquaitanceResponse> findAll(long id);
 
     void delete(long id);
 

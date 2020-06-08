@@ -6,7 +6,7 @@ public class AcquaitanceResponse {
     private Long id;
     private String dateOfAcceptance;
     private String status;
-    private Long requestSenderId;
+    private UserResponse requestSenderId;
     private Long requestReceiverId;
 
     public AcquaitanceResponse(Acquaintance acquaintance){
@@ -19,7 +19,27 @@ public class AcquaitanceResponse {
             this.requestReceiverId = acquaintance.getRequestReceiver().getId();
         }
         if(acquaintance.getRequestSender() != null){
-            this.requestSenderId = acquaintance.getRequestSender().getId();
+            this.requestSenderId = new UserResponse(acquaintance.getRequestSender());
         }
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getDateOfAcceptance() {
+        return dateOfAcceptance;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public UserResponse getRequestSenderId() {
+        return requestSenderId;
+    }
+
+    public Long getRequestReceiverId() {
+        return requestReceiverId;
     }
 }

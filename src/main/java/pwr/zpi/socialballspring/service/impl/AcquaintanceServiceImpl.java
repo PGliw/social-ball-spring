@@ -27,10 +27,10 @@ public class AcquaintanceServiceImpl implements AcquaintanceService {
     UserDao userDao;
 
     @Override
-    public List<AcquaitanceResponse> findAll() {
+    public List<AcquaitanceResponse> findAll(long id) {
         List<Acquaintance> list = new ArrayList<>();
         acquaitanceDao.findAll().iterator().forEachRemaining(list::add);
-        return list.stream().map(AcquaitanceResponse::new).collect(Collectors.toList());
+        return list.stream().filter(a -> a.getRequestReceiver().getId().equals(id)).map(AcquaitanceResponse::new).collect(Collectors.toList());
     }
 
     @Override
