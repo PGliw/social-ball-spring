@@ -1,6 +1,5 @@
 package pwr.zpi.socialballspring.service.impl;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,6 +15,8 @@ import pwr.zpi.socialballspring.model.User;
 import pwr.zpi.socialballspring.repository.UserDao;
 import pwr.zpi.socialballspring.service.UserService;
 
+import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -70,15 +71,48 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     public UserResponse update(UserDto userDto, long id) {
         Optional<User> optionalUser = userDao.findById(id);
         if (optionalUser.isPresent()) {
+            @NotNull char[] passwod = optionalUser.get().getPassword();
+            if (userDto.getPassword() != null) {
+                passwod = userDto.getPassword();
+            }
+            @NotNull String email = optionalUser.get().getEmail();
+            if (userDto.getEmail() != null) {
+                email = userDto.getEmail();
+            }
+            @NotNull String firstName = optionalUser.get().getFirstName();
+            if (userDto.getFirstName() != null) {
+                firstName = userDto.getFirstName();
+            }
+            @NotNull String lastName = optionalUser.get().getLastName();
+            if (userDto.getLastName() != null) {
+                lastName = userDto.getLastName();
+            }
+            @NotNull String userName = optionalUser.get().getUsername();
+            if (userDto.getLastName() != null) {
+                userName = userDto.getUsername();
+            }
+            @NotNull LocalDate dateOfBirth = optionalUser.get().getDateOfBirth();
+            if (userDto.getDateOfBirth() != null) {
+                dateOfBirth = userDto.getDateOfBirth();
+            }
+            @NotNull String image = optionalUser.get().getImage();
+            if (userDto.getImage() != null) {
+                image = userDto.getImage();
+            }
+            @NotNull Long newId = optionalUser.get().getId();
+            if (userDto.getId() != null) {
+                newId = userDto.getId();
+            }
+
             User user = User.builder()
-                    .email(userDto.getEmail())
-                    .firstName(userDto.getFirstName())
-                    .lastName(userDto.getLastName())
-                    .username(userDto.getUsername())
-                    .password(bcryptEncoder.encode(new String(userDto.getPassword())).toCharArray())
-                    .dateOfBirth(userDto.getDateOfBirth())
-                    .image(userDto.getImage())
-                    .id(id)
+                    .email(email)
+                    .firstName(firstName)
+                    .lastName(lastName)
+                    .username(userName)
+                    .password(bcryptEncoder.encode(new String(passwod)).toCharArray())
+                    .dateOfBirth(dateOfBirth)
+                    .image(image)
+                    .id(newId)
                     .build();
             User savedUser = userDao.save(user);
             return new UserResponse(savedUser);
