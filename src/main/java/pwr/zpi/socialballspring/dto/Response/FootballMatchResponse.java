@@ -3,6 +3,7 @@ package pwr.zpi.socialballspring.dto.Response;
 import lombok.Data;
 import pwr.zpi.socialballspring.model.FootballMatch;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,6 +20,7 @@ public class FootballMatchResponse {
     private boolean ifFinished;
     private boolean isCurrentUserOrganizer;
     private String score;
+    private String statusTime;
 
     public FootballMatchResponse(FootballMatch footballMatch, boolean isCurrentUserOrganizer) {
         this.id = footballMatch.getId();
@@ -43,5 +45,14 @@ public class FootballMatchResponse {
         }
         this.isCurrentUserOrganizer = isCurrentUserOrganizer;
         this.score = footballMatch.getMatchScore();
+        if(footballMatch.getBeginningTime() != null && footballMatch.getEndingTime() != null) {
+            if (LocalDateTime.now().isBefore(footballMatch.getBeginningTime())) {
+                this.statusTime = "past";
+            } else if (LocalDateTime.now().isAfter(footballMatch.getEndingTime())) {
+                this.statusTime = "future";
+            } else {
+                this.statusTime = "present";
+            }
+        }
     }
 }
