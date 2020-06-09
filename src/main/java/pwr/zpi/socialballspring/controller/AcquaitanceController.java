@@ -27,8 +27,8 @@ public class AcquaitanceController {
     }
 
     @GetMapping
-    public ResponseEntity<List<AcquaitanceResponse>> listAcquaitance() {
-        return new ResponseEntity<>(acquaintanceService.findAll(identityManager.getCurrentUser().getId()), HttpStatus.OK);
+    public ResponseEntity<List<AcquaitanceResponse>> listAcquaitance(@RequestParam String status) {
+        return new ResponseEntity<>(acquaintanceService.findAll(identityManager.getCurrentUser().getId(), status), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -45,5 +45,15 @@ public class AcquaitanceController {
     public ResponseEntity<String> delete(@PathVariable long id) {
         acquaintanceService.delete(id);
         return new ResponseEntity<>("Acquaitance deleted successfully", HttpStatus.OK);
+    }
+
+    @PutMapping("/send")
+    public void send(@RequestParam long receiverId){
+        acquaintanceService.send(receiverId);
+    }
+
+    @PutMapping("/accept")
+    public void accept(@RequestParam long senderId){
+        acquaintanceService.accept(senderId);
     }
 }
