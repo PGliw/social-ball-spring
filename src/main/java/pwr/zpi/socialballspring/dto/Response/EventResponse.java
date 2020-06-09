@@ -1,7 +1,9 @@
 package pwr.zpi.socialballspring.dto.Response;
 
+import lombok.Data;
 import pwr.zpi.socialballspring.model.Event;
 
+@Data
 public class EventResponse {
     private Long id;
     private String type;

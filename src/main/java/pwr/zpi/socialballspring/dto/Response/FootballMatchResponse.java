@@ -17,8 +17,10 @@ public class FootballMatchResponse {
     private FootballPitchResponse pitch;
     private List<TeamResponse> teams;
     private boolean ifFinished;
+    private boolean isCurrentUserOrganizer;
+    private String score;
 
-    public FootballMatchResponse(FootballMatch footballMatch) {
+    public FootballMatchResponse(FootballMatch footballMatch, boolean isCurrentUserOrganizer) {
         this.id = footballMatch.getId();
         if (footballMatch.getTitle() != null) {
             title = footballMatch.getTitle();
@@ -39,5 +41,7 @@ public class FootballMatchResponse {
         if (footballMatch.getMatchMembers() != null) {
             this.teams = footballMatch.getTeamsInvolved().stream().map(TeamResponse::new).collect(Collectors.toList());
         }
+        this.isCurrentUserOrganizer = isCurrentUserOrganizer;
+        this.score = footballMatch.getMatchScore();
     }
 }

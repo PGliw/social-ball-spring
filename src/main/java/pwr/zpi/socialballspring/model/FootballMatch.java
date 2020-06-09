@@ -20,6 +20,7 @@ public class FootballMatch {
     private String title;
     private String description;
     private Boolean ifFinished;
+    private String matchScore;
 
     @ManyToOne
     private User organizer;
