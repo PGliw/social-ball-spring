@@ -1,7 +1,9 @@
 package pwr.zpi.socialballspring.dto.Response;
 
+import lombok.Data;
 import pwr.zpi.socialballspring.model.FavouritePosition;
 
+@Data
 public class FavouritePositionResponse {
     private Long id;
     private Long userId;
@@ -15,17 +17,5 @@ public class FavouritePositionResponse {
         if(favouritePosition.getUser().getId() != null){
             this.userId = favouritePosition.getUser().getId();
         }
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public PositionResponse getPositionId() {
-        return positionId;
     }
 }

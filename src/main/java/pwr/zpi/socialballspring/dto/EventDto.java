@@ -8,4 +8,5 @@ public class EventDto {
     private String type;
     private Long matchMemberId;
     private Long footballMatchId;
+    private String dateTime;
 }

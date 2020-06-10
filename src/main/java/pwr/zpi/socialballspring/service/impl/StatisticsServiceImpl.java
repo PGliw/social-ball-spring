@@ -25,14 +25,14 @@ public class StatisticsServiceImpl implements StatisticsService {
         long goals = 0;
         long matches = 0;
         if(appearances != null) {
-            matches = appearances.stream().filter(a -> a.getFootballMatch().getIfFinished()).count();
+            matches = appearances.stream().filter(a -> a.getFootballMatch().getIsFinished()).count();
         }
         long minutesPlayed = 0;
         if(appearances != null) {
             for (MatchMember appearance : appearances) {
                 goals += appearance.getEventsInvolvingMatchMember().stream()
                         .filter(e -> e.getType().equals("Strzelenie gola")).count();
-                if(appearance.getFootballMatch().getBeginningTime() != null && appearance.getFootballMatch().getEndingTime() != null && appearance.getFootballMatch().getIfFinished()) {
+                if(appearance.getFootballMatch().getBeginningTime() != null && appearance.getFootballMatch().getEndingTime() != null && appearance.getFootballMatch().getIsFinished()) {
                     minutesPlayed = Duration.between(appearance.getFootballMatch().getBeginningTime(),
                             appearance.getFootballMatch().getEndingTime()).toMinutes();
                 }

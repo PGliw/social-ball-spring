@@ -3,6 +3,7 @@ package pwr.zpi.socialballspring.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pwr.zpi.socialballspring.dto.EventDto;
+import pwr.zpi.socialballspring.dto.MatchProtocolDto;
 import pwr.zpi.socialballspring.dto.Response.EventResponse;
 import pwr.zpi.socialballspring.exception.NotFoundException;
 import pwr.zpi.socialballspring.model.Event;
@@ -12,7 +13,10 @@ import pwr.zpi.socialballspring.repository.EventDao;
 import pwr.zpi.socialballspring.repository.FootballMatchDao;
 import pwr.zpi.socialballspring.repository.MatchMemberDao;
 import pwr.zpi.socialballspring.service.EventService;
+import pwr.zpi.socialballspring.util.dateUtils;
 
+import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -52,11 +56,11 @@ public class EventServiceImpl implements EventService {
         Optional<Event> optionalEvent = eventDao.findById(id);
         if (optionalEvent.isPresent()) {
             FootballMatch footballMatch = null;
-            if(eventDto.getFootballMatchId() != null){
+            if (eventDto.getFootballMatchId() != null) {
                 footballMatch = footballMatchDao.findById(eventDto.getFootballMatchId()).get();
             }
             MatchMember matchMember = null;
-            if(eventDto.getMatchMemberId() != null) {
+            if (eventDto.getMatchMemberId() != null) {
                 matchMember = matchMemberDao.findById(eventDto.getMatchMemberId()).get();
             }
             Event event = Event.builder()
@@ -71,21 +75,55 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional
     public EventResponse save(EventDto eventDto) {
         FootballMatch footballMatch = null;
-        if(eventDto.getFootballMatchId() != null){
-            footballMatch = footballMatchDao.findById(eventDto.getFootballMatchId()).get();
+        if (eventDto.getFootballMatchId() != null) {
+            final Optional<FootballMatch> existingFootballMatch = footballMatchDao.findById(eventDto.getFootballMatchId());
+            if (existingFootballMatch.isPresent()) {
+                footballMatch = existingFootballMatch.get();
+            } else throw new NotFoundException("FootballMatch");
         }
         MatchMember matchMember = null;
-        if(eventDto.getMatchMemberId() != null) {
-            matchMember = matchMemberDao.findById(eventDto.getMatchMemberId()).get();
+        if (eventDto.getMatchMemberId() != null) {
+            final Optional<MatchMember> existingMatchMember = matchMemberDao.findById(eventDto.getMatchMemberId());
+            if (existingMatchMember.isPresent()) {
+                matchMember = existingMatchMember.get();
+            } else throw new NotFoundException("MathMember");
         }
-        Event event = Event.builder()
+        final Event event = Event.builder()
                 .footballMatch(footballMatch)
                 .matchMember(matchMember)
                 .type(eventDto.getType())
+                .dateTime(dateUtils.convertFromString(eventDto.getDateTime()))
                 .build();
         Event savedEvent = eventDao.save(event);
         return new EventResponse(savedEvent);
+    }
+
+    @Override
+    @Transactional
+    public List<EventResponse> saveProtocol(MatchProtocolDto matchProtocolDto, long id) {
+        final List<EventDto> dtoEvents = matchProtocolDto.getEvents().stream().peek(eventDto -> eventDto.setFootballMatchId(id)).collect(Collectors.toList());
+        final List<EventResponse> responseEvents = dtoEvents.stream().map(this::save).collect(Collectors.toList());
+        final Optional<FootballMatch> footballMatchOptional = footballMatchDao.findById(id);
+        if (footballMatchOptional.isPresent()) {
+            FootballMatch newFootballMatch = footballMatchOptional.get();
+            newFootballMatch.setHasProtocol(true);
+            footballMatchDao.save(newFootballMatch);
+        } else throw new NotFoundException("FootballMatch");
+        return responseEvents;
+    }
+
+    @Override
+    @Transactional
+    public List<EventResponse> findProtocol(long id) {
+        final Optional<FootballMatch> footballMatchOptional = footballMatchDao.findById(id);
+        if (footballMatchOptional.isPresent()) {
+            FootballMatch newFootballMatch = footballMatchOptional.get();
+            footballMatchDao.save(newFootballMatch);
+        } else throw new NotFoundException("FootballMatch");
+        final List<Event> events = eventDao.findByFootballMatchId(id);
+        return events.stream().map(EventResponse::new).collect(Collectors.toList());
     }
 }

@@ -16,7 +16,8 @@ public class FootballMatchResponse {
     private UserResponse organizer;
     private FootballPitchResponse pitch;
     private List<TeamResponse> teams;
-    private boolean ifFinished;
+    private boolean isFinished;
+    private boolean hasProtocol;
 
     public FootballMatchResponse(FootballMatch footballMatch) {
         this.id = footballMatch.getId();
@@ -38,6 +39,12 @@ public class FootballMatchResponse {
         }
         if (footballMatch.getMatchMembers() != null) {
             this.teams = footballMatch.getTeamsInvolved().stream().map(TeamResponse::new).collect(Collectors.toList());
+        }
+        if (footballMatch.getIsFinished() != null) {
+            this.isFinished = footballMatch.getIsFinished();
+        }
+        if (footballMatch.getHasProtocol() != null) {
+            this.hasProtocol = footballMatch.getHasProtocol();
         }
     }
 }

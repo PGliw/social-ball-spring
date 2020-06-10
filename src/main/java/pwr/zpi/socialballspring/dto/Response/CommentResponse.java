@@ -1,7 +1,9 @@
 package pwr.zpi.socialballspring.dto.Response;
 
+import lombok.Data;
 import pwr.zpi.socialballspring.model.Comment;
 
+@Data
 public class CommentResponse {
     private Long id;
     private String dateOfAddition;
@@ -21,25 +23,5 @@ public class CommentResponse {
         if(comment.getRelatedMatchMember() != null){
             this.relatedMatchMemberId = new MatchMemberResponse(comment.getRelatedMatchMember());
         }
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getDateOfAddition() {
-        return dateOfAddition;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public Long getRelatedMatchId() {
-        return relatedMatchId;
-    }
-
-    public MatchMemberResponse getRelatedMatchMemberId() {
-        return relatedMatchMemberId;
     }
 }

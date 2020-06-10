@@ -5,8 +5,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pwr.zpi.socialballspring.config.IIdentityManager;
+import pwr.zpi.socialballspring.dto.EventDto;
 import pwr.zpi.socialballspring.dto.FootballMatchDto;
+import pwr.zpi.socialballspring.dto.MatchProtocolDto;
+import pwr.zpi.socialballspring.dto.Response.EventResponse;
 import pwr.zpi.socialballspring.dto.Response.FootballMatchResponse;
+import pwr.zpi.socialballspring.service.EventService;
 import pwr.zpi.socialballspring.service.FootballMatchService;
 
 import java.util.List;
@@ -17,6 +21,9 @@ import java.util.List;
 public class FootballMatchController {
     @Autowired
     private FootballMatchService footballMatchService;
+
+    @Autowired
+    private EventService eventService;
 
     @Autowired
     private IIdentityManager identityManager;
@@ -45,5 +52,15 @@ public class FootballMatchController {
     public ResponseEntity<String> delete(@PathVariable long id) {
         footballMatchService.delete(id);
         return new ResponseEntity<>("FootballMatch deleted successfully", HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}/events")
+    public ResponseEntity<List<EventResponse>> getMatchEvents(@PathVariable long id) {
+        return new ResponseEntity<>(eventService.findProtocol(id), HttpStatus.OK);
+    }
+
+    @PostMapping("/{id}/events")
+    public ResponseEntity<List<EventResponse>> saveMatchEvents(@RequestBody MatchProtocolDto matchProtocolDto, @PathVariable long id) {
+        return new ResponseEntity<>(eventService.saveProtocol(matchProtocolDto, id), HttpStatus.OK);
     }
 }

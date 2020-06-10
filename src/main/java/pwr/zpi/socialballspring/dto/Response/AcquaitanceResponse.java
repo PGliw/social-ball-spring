@@ -1,7 +1,9 @@
 package pwr.zpi.socialballspring.dto.Response;
 
+import lombok.Data;
 import pwr.zpi.socialballspring.model.Acquaintance;
 
+@Data
 public class AcquaitanceResponse {
     private Long id;
     private String dateOfAcceptance;
@@ -21,25 +23,5 @@ public class AcquaitanceResponse {
         if(acquaintance.getRequestSender() != null){
             this.requestSenderId = new UserResponse(acquaintance.getRequestSender());
         }
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getDateOfAcceptance() {
-        return dateOfAcceptance;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public UserResponse getRequestSenderId() {
-        return requestSenderId;
-    }
-
-    public Long getRequestReceiverId() {
-        return requestReceiverId;
     }
 }

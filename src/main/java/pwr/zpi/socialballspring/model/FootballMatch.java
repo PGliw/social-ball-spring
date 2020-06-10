@@ -19,7 +19,8 @@ public class FootballMatch {
     private LocalDateTime endingTime;
     private String title;
     private String description;
-    private Boolean ifFinished;
+    private Boolean isFinished;
+    private Boolean hasProtocol;
 
     @ManyToOne
     private User organizer;
