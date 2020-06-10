@@ -14,6 +14,7 @@ import pwr.zpi.socialballspring.service.EventService;
 import pwr.zpi.socialballspring.service.FootballMatchService;
 
 import java.util.List;
+import java.util.Optional;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -34,8 +35,8 @@ public class FootballMatchController {
     }
 
     @GetMapping
-    public ResponseEntity<List<FootballMatchResponse>> listFootballMatch() {
-        return new ResponseEntity<>(footballMatchService.findAll(), HttpStatus.OK);
+    public ResponseEntity<List<FootballMatchResponse>> listFootballMatch(@RequestParam Optional<Boolean> onlyMyMatches) {
+        return new ResponseEntity<>(footballMatchService.findAll(onlyMyMatches), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")

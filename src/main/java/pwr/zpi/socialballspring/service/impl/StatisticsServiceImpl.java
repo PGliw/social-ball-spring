@@ -20,25 +20,35 @@ public class StatisticsServiceImpl implements StatisticsService {
     IIdentityManager identityManager;
 
     @Override
-    public StatisticsResponse findById(){
+    public StatisticsResponse findById() {
         List<MatchMember> appearances = identityManager.getCurrentUser().getAppearancesAsMatchMember();
         long goals = 0;
+        long yellowCards = 0;
+        long redCards = 0;
+        long fauls = 0;
         long matches = 0;
-        if(appearances != null) {
+        if (appearances != null) {
             matches = appearances.stream().filter(a -> a.getFootballMatch().getIsFinished()).count();
         }
         long minutesPlayed = 0;
-        if(appearances != null) {
+        if (appearances != null) {
             for (MatchMember appearance : appearances) {
                 goals += appearance.getEventsInvolvingMatchMember().stream()
                         .filter(e -> e.getType().equals("Strzelenie gola")).count();
-                if(appearance.getFootballMatch().getBeginningTime() != null && appearance.getFootballMatch().getEndingTime() != null && appearance.getFootballMatch().getIsFinished()) {
+
+                yellowCards += appearance.getEventsInvolvingMatchMember().stream()
+                        .filter(e -> e.getType().equals("Żółta kartka")).count();
+                redCards += appearance.getEventsInvolvingMatchMember().stream()
+                        .filter(e -> e.getType().equals("Czerwona kartka")).count();
+                fauls += appearance.getEventsInvolvingMatchMember().stream()
+                        .filter(e -> e.getType().equals("Faul")).count();
+                if (appearance.getFootballMatch().getBeginningTime() != null && appearance.getFootballMatch().getEndingTime() != null && appearance.getFootballMatch().getIfFinished()) {
                     minutesPlayed = Duration.between(appearance.getFootballMatch().getBeginningTime(),
                             appearance.getFootballMatch().getEndingTime()).toMinutes();
                 }
             }
         }
-        long hoursPlayed = minutesPlayed/60;
-        return new StatisticsResponse(goals, matches, hoursPlayed);
+        long hoursPlayed = minutesPlayed / 60;
+        return new StatisticsResponse(goals, matches, hoursPlayed, yellowCards, redCards, fauls);
     }
 }

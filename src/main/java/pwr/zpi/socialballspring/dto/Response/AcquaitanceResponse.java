@@ -8,8 +8,8 @@ public class AcquaitanceResponse {
     private Long id;
     private String dateOfAcceptance;
     private String status;
-    private UserResponse requestSenderId;
-    private Long requestReceiverId;
+    private UserResponse requestSender;
+    private UserResponse requestReceiver;
 
     public AcquaitanceResponse(Acquaintance acquaintance){
         this.id = acquaintance.getId();
@@ -18,10 +18,10 @@ public class AcquaitanceResponse {
         }
         this.status = acquaintance.getStatus();
         if(acquaintance.getRequestReceiver() != null){
-            this.requestReceiverId = acquaintance.getRequestReceiver().getId();
+            this.requestReceiver = new UserResponse(acquaintance.getRequestReceiver());
         }
         if(acquaintance.getRequestSender() != null){
-            this.requestSenderId = new UserResponse(acquaintance.getRequestSender());
+            this.requestSender = new UserResponse(acquaintance.getRequestSender());
         }
     }
 }

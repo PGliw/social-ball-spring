@@ -2,6 +2,7 @@ package pwr.zpi.socialballspring.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import pwr.zpi.socialballspring.config.IdentityManager;
 import pwr.zpi.socialballspring.dto.AcquaitanceDto;
 import pwr.zpi.socialballspring.dto.Response.AcquaitanceResponse;
 import pwr.zpi.socialballspring.exception.NotFoundException;
@@ -26,11 +27,27 @@ public class AcquaintanceServiceImpl implements AcquaintanceService {
     @Autowired
     UserDao userDao;
 
+    @Autowired
+    IdentityManager identityManager;
+
     @Override
-    public List<AcquaitanceResponse> findAll(long id) {
+    public List<AcquaitanceResponse> findAll(long id, String status) {
         List<Acquaintance> list = new ArrayList<>();
         acquaitanceDao.findAll().iterator().forEachRemaining(list::add);
-        return list.stream().filter(a -> a.getRequestReceiver().getId().equals(id)).map(AcquaitanceResponse::new).collect(Collectors.toList());
+        if(status.equals("pending")) {
+            return list.stream()
+                    .filter(a -> a.getRequestReceiver().getId().equals(id))
+                    .filter(a -> a.getStatus().equals(status))
+                    .map(AcquaitanceResponse::new).collect(Collectors.toList());
+        }
+        else if(status.equals("accepted")) {
+            return list.stream()
+                    .filter(a -> a.getRequestReceiver().getId().equals(id) || a.getRequestSender().getId().equals(id))
+                    .filter(a -> a.getStatus().equals(status))
+                    .map(AcquaitanceResponse::new).collect(Collectors.toList());
+        } else {
+            throw new NotFoundException("Status");
+        }
     }
 
     @Override
@@ -88,5 +105,39 @@ public class AcquaintanceServiceImpl implements AcquaintanceService {
                 .build();
         Acquaintance savedAcquaintance = acquaitanceDao.save(acquaintance);
         return new AcquaitanceResponse(savedAcquaintance);
+    }
+
+    @Override
+    public void send(long userId) {
+        Optional<User> receiver = userDao.findById(userId);
+        if(receiver.isPresent()) {
+            Acquaintance acquaintance = Acquaintance.builder()
+                    .requestSender(identityManager.getCurrentUser())
+                    .requestReceiver(receiver.get())
+                    .status("pending")
+                    .build();
+            acquaitanceDao.save(acquaintance);
+        } else {
+            throw new NotFoundException("User");
+        }
+    }
+
+    @Override
+    public void accept(long userId){
+        Optional<User> sender = userDao.findById(userId);
+        if(sender.isPresent()) {
+            List<Acquaintance> list = new ArrayList<>();
+            acquaitanceDao.findAll().iterator().forEachRemaining(list::add);
+            Optional<Acquaintance> acquaintance = list.stream()
+                    .filter(a -> a.getRequestReceiver().getId().equals(identityManager.getCurrentUser().getId()))
+                    .filter(a -> a.getRequestSender().getId().equals(userId))
+                    .findFirst();
+            if(acquaintance.isPresent()) {
+                acquaintance.get().setStatus("accepted");
+                acquaitanceDao.save(acquaintance.get());
+            }
+        } else {
+            throw new NotFoundException("User");
+        }
     }
 }

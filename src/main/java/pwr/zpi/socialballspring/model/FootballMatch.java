@@ -21,6 +21,8 @@ public class FootballMatch {
     private String description;
     private Boolean isFinished;
     private Boolean hasProtocol;
+    private String matchScore;
+
 
     @ManyToOne
     private User organizer;

@@ -98,6 +98,14 @@ public class EventServiceImpl implements EventService {
                 .dateTime(dateUtils.convertFromString(eventDto.getDateTime()))
                 .build();
         Event savedEvent = eventDao.save(event);
+        if(event.getType().equals("Zdobycie gola")){
+            if(event.getFootballMatch().getTeamsInvolved().get(0).getId().equals(event.getMatchMember().getTeam().getId())){
+                event.getFootballMatch().setMatchScore((Character.getNumericValue(event.getFootballMatch().getMatchScore().charAt(0))+1) + event.getFootballMatch().getMatchScore().substring(1,3));
+            } else{
+                event.getFootballMatch().setMatchScore( event.getFootballMatch().getMatchScore().substring(2) + (Character.getNumericValue(event.getFootballMatch().getMatchScore().charAt(2))+1));
+            }
+            footballMatchDao.save(event.getFootballMatch());
+        }
         return new EventResponse(savedEvent);
     }
 

@@ -15,6 +15,7 @@ public class UserResponse {
     private String username;
     private String email;
     private String image;
+    private Long id;
 
     public UserResponse(User user) {
         this.firstName = user.getFirstName();
@@ -23,5 +24,6 @@ public class UserResponse {
         this.image = user.getImage();
         this.email = user.getEmail();
         this.username = user.getUsername();
+        this.id = user.getId();
     }
 }

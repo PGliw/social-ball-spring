@@ -8,11 +8,15 @@ import java.util.List;
 public interface AcquaintanceService {
     AcquaitanceResponse save(AcquaitanceDto acquaintance);
 
-    List<AcquaitanceResponse> findAll(long id);
+    List<AcquaitanceResponse> findAll(long id, String status);
 
     void delete(long id);
 
     AcquaitanceResponse findById(long id);
 
     AcquaitanceResponse update(AcquaitanceDto acquaintance, long id);
+
+    void send(long id);
+
+    void accept(long id);
 }
