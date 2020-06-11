@@ -56,4 +56,9 @@ public class AcquaitanceController {
     public void accept(@RequestParam long senderId){
         acquaintanceService.accept(senderId);
     }
+
+    @PutMapping("/reject")
+    public void reject(@RequestParam long senderId){
+        acquaintanceService.reject(senderId);
+    }
 }
