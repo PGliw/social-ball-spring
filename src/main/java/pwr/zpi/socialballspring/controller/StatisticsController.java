@@ -23,4 +23,8 @@ public class StatisticsController {
     public ResponseEntity<StatisticsResponse> getStats(@PathVariable long id){
         return new ResponseEntity<>(statisticsService.findByUser(id), HttpStatus.OK);
     }
+    @GetMapping("/global")
+    public ResponseEntity<StatisticsResponse> getGlobalStats(){
+        return new ResponseEntity<>(statisticsService.findGlobal(), HttpStatus.OK);
+    }
 }
