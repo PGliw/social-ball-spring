@@ -19,4 +19,6 @@ public interface AcquaintanceService {
     void send(long id);
 
     void accept(long id);
+
+    void reject(long id);
 }
