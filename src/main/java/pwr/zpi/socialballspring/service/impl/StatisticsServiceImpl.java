@@ -1,20 +1,30 @@
 package pwr.zpi.socialballspring.service.impl;
 
+import org.apache.tomcat.jni.Time;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pwr.zpi.socialballspring.config.IIdentityManager;
+import pwr.zpi.socialballspring.dto.Response.MonthStatisticsResponse;
 import pwr.zpi.socialballspring.dto.Response.StatisticsResponse;
+import pwr.zpi.socialballspring.dto.Response.TimeStatisticsResponse;
 import pwr.zpi.socialballspring.model.Event;
 import pwr.zpi.socialballspring.model.FootballMatch;
 import pwr.zpi.socialballspring.model.MatchMember;
+import pwr.zpi.socialballspring.model.User;
 import pwr.zpi.socialballspring.repository.EventDao;
 import pwr.zpi.socialballspring.repository.FootballMatchDao;
 import pwr.zpi.socialballspring.repository.UserDao;
 import pwr.zpi.socialballspring.service.StatisticsService;
 
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Objects;
+
+import static java.util.stream.Collectors.toList;
 
 @Service(value = "statisticsService")
 public class StatisticsServiceImpl implements StatisticsService {
@@ -107,5 +117,33 @@ public class StatisticsServiceImpl implements StatisticsService {
         long matches = matchesList.size();
         long hoursPlayed = 0;
         return new StatisticsResponse(goals, matches, hoursPlayed, yellowCards, redCards, fauls);
+    }
+
+    @Override
+    public TimeStatisticsResponse findTimeStats(long monthsNumber){
+        LocalDate localDate = LocalDate.now();
+        List<FootballMatch> matchesList = new ArrayList<>();
+        footballMatchDao.findAll().iterator().forEachRemaining(matchesList::add);
+        List<User> users = new ArrayList<>();
+        userDao.findAll().iterator().forEachRemaining(users::add);
+        List<MonthStatisticsResponse> monthStatisticsResponses = new ArrayList<>();
+        for(int i = 0; i < monthsNumber; i++){
+            LocalDate minusDate = localDate.minusMonths(i);
+            Month month = minusDate.getMonth();
+            long matches = matchesList.stream()
+                    .filter(m -> Objects.nonNull(m.getBeginningTime()))
+                    .filter(m -> m.getBeginningTime().getMonth().equals(month))
+                    .count();
+            long players = users.stream()
+                    .map(m -> m.getAppearancesAsMatchMember().stream()
+                            .filter(p -> Objects.nonNull(p.getFootballMatch()))
+                            .filter(p -> Objects.nonNull(p.getFootballMatch().getBeginningTime()))
+                            .filter(p -> p.getFootballMatch().getBeginningTime().getMonth().equals(month))
+                    .collect(toList()))
+                    .filter(p -> p.size() > 0)
+                    .count();
+            monthStatisticsResponses.add(new MonthStatisticsResponse(month.toString()+" " + minusDate.getYear(), matches, players));
+        }
+        return new TimeStatisticsResponse(monthStatisticsResponses);
     }
 }
