@@ -102,7 +102,7 @@ public class FootballMatchServiceImpl implements FootballMatchService {
                 .description(footballMatchDto.getDescription())
                 .beginningTime(beginningTime)
                 .endingTime(endingTime)
-                .ifFinished(false)
+                .isFinished(false)
                 .matchScore("0-0")
                 .organizer(identityManager.getCurrentUser())
                 .footballPitch(footballPitch)

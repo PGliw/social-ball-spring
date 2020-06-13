@@ -42,7 +42,7 @@ public class StatisticsServiceImpl implements StatisticsService {
                         .filter(e -> e.getType().equals("Czerwona kartka")).count();
                 fauls += appearance.getEventsInvolvingMatchMember().stream()
                         .filter(e -> e.getType().equals("Faul")).count();
-                if (appearance.getFootballMatch().getBeginningTime() != null && appearance.getFootballMatch().getEndingTime() != null && appearance.getFootballMatch().getIfFinished()) {
+                if (appearance.getFootballMatch().getBeginningTime() != null && appearance.getFootballMatch().getEndingTime() != null && appearance.getFootballMatch().getIsFinished()) {
                     minutesPlayed = Duration.between(appearance.getFootballMatch().getBeginningTime(),
                             appearance.getFootballMatch().getEndingTime()).toMinutes();
                 }
