@@ -2,14 +2,13 @@ package pwr.zpi.socialballspring.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import pwr.zpi.socialballspring.config.IdentityManager;
 import pwr.zpi.socialballspring.dto.EventDto;
 import pwr.zpi.socialballspring.dto.MatchProtocolDto;
 import pwr.zpi.socialballspring.dto.Response.EventResponse;
 import pwr.zpi.socialballspring.exception.NotFoundException;
-import pwr.zpi.socialballspring.model.Event;
-import pwr.zpi.socialballspring.model.FootballMatch;
-import pwr.zpi.socialballspring.model.MatchMember;
-import pwr.zpi.socialballspring.model.Team;
+import pwr.zpi.socialballspring.model.*;
+import pwr.zpi.socialballspring.repository.AcquaitanceDao;
 import pwr.zpi.socialballspring.repository.EventDao;
 import pwr.zpi.socialballspring.repository.FootballMatchDao;
 import pwr.zpi.socialballspring.repository.MatchMemberDao;
@@ -22,11 +21,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service(value = "eventService")
 public class EventServiceImpl implements EventService {
     @Autowired
     EventDao eventDao;
+
+    @Autowired
+    AcquaitanceDao acquaitanceDao;
+
+    @Autowired
+    IdentityManager identityManager;
 
     @Autowired
     MatchMemberDao matchMemberDao;
@@ -35,9 +41,28 @@ public class EventServiceImpl implements EventService {
     FootballMatchDao footballMatchDao;
 
     @Override
-    public List<EventResponse> findAll() {
+    public List<EventResponse> findAll(Optional<Boolean> forAcquaitance) {
         List<Event> list = new ArrayList<>();
         eventDao.findAll().iterator().forEachRemaining(list::add);
+        if(forAcquaitance.isPresent() && forAcquaitance.get()){
+            List<Acquaintance> acquaintances = new ArrayList<>();
+            acquaitanceDao.findAll().iterator().forEachRemaining(acquaintances::add);
+            List<User> acquaitanceUsers = Stream.concat(acquaintances.stream()
+                            .filter(a -> a.getRequestSender().getId().equals(identityManager.getCurrentUser().getId()))
+                            .filter(a -> a.getStatus().equals("accepted"))
+                            .map(a -> a.getRequestReceiver()),
+                        acquaintances.stream()
+                            .filter(a -> a.getRequestReceiver().getId().equals(identityManager.getCurrentUser().getId()))
+                            .filter(a -> a.getStatus().equals("accepted"))
+                            .map(a -> a.getRequestSender()))
+                    .distinct()
+                    .filter(u -> !u.getId().equals(identityManager.getCurrentUser().getId()))
+                    .collect(Collectors.toList());
+            return list.stream()
+                    .filter(e -> acquaitanceUsers.contains(e.getMatchMember().getUser()))
+                    .map(EventResponse::new)
+                    .collect(Collectors.toList());
+        }
         return list.stream().map(EventResponse::new).collect(Collectors.toList());
     }
 

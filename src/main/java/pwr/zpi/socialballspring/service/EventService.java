@@ -5,11 +5,12 @@ import pwr.zpi.socialballspring.dto.MatchProtocolDto;
 import pwr.zpi.socialballspring.dto.Response.EventResponse;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface EventService {
     EventResponse save(EventDto event);
 
-    List<EventResponse> findAll();
+    List<EventResponse> findAll(Optional<Boolean> forAcquaitance);
 
     void delete(long id);
 

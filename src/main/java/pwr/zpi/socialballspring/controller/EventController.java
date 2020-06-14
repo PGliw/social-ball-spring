@@ -9,6 +9,7 @@ import pwr.zpi.socialballspring.dto.Response.EventResponse;
 import pwr.zpi.socialballspring.service.EventService;
 
 import java.util.List;
+import java.util.Optional;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -23,8 +24,8 @@ public class EventController {
     }
 
     @GetMapping
-    public ResponseEntity<List<EventResponse>> listEvent() {
-        return new ResponseEntity<>(eventService.findAll(), HttpStatus.OK);
+    public ResponseEntity<List<EventResponse>> listEvent(@RequestParam Optional<Boolean> forAcquaitance) {
+        return new ResponseEntity<>(eventService.findAll(forAcquaitance), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
