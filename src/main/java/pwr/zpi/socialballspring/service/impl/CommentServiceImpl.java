@@ -2,6 +2,7 @@ package pwr.zpi.socialballspring.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import pwr.zpi.socialballspring.config.IdentityManager;
 import pwr.zpi.socialballspring.dto.CommentDto;
 import pwr.zpi.socialballspring.dto.Response.CommentResponse;
 import pwr.zpi.socialballspring.exception.NotFoundException;
@@ -29,6 +30,9 @@ public class CommentServiceImpl implements CommentService {
 
     @Autowired
     FootballMatchDao footballMatchDao;
+
+    @Autowired
+    IdentityManager identityManager;
 
     @Override
     public List<CommentResponse> findAll(Optional<Long> matchId, Optional<Long> userId) {
@@ -88,8 +92,17 @@ public class CommentServiceImpl implements CommentService {
             footballMatch = footballMatchDao.findById(commentDto.getRelatedMatchId()).get();
         }
         MatchMember matchMember = null;
-        if(commentDto.getRelatedMatchMemberId() != null) {
-            matchMember = matchMemberDao.findById(commentDto.getRelatedMatchMemberId()).get();
+        List<MatchMember> matchMembers = new ArrayList<>();
+        matchMemberDao.findAll().iterator().forEachRemaining(matchMembers::add);
+        FootballMatch finalFootballMatch = footballMatch;
+        if(footballMatch != null) {
+            Optional<MatchMember> matchMemberOpt = matchMembers.stream()
+                    .filter(m -> m.getUser().getId().equals(identityManager.getCurrentUser().getId()))
+                    .filter(m -> m.getFootballMatch().getId().equals(finalFootballMatch.getId()))
+                    .findFirst();
+            if(matchMemberOpt.isPresent()){
+                matchMember = matchMemberOpt.get();
+            }
         }
         Comment comment = Comment.builder()
                 .relatedMatch(footballMatch)
