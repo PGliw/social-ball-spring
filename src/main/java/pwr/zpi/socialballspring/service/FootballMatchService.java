@@ -9,7 +9,7 @@ import java.util.Optional;
 public interface FootballMatchService {
     FootballMatchResponse save(FootballMatchDto footballMatch);
 
-    List<FootballMatchResponse> findAll(Optional<Boolean> onlyMyMatches);
+    List<FootballMatchResponse> findAll(boolean isOrganizer, boolean isPlayer, boolean isDetailed);
 
     void delete(long id);
 

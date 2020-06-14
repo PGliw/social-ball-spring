@@ -8,16 +8,21 @@ import pwr.zpi.socialballspring.dto.Response.FootballMatchResponse;
 import pwr.zpi.socialballspring.exception.NotFoundException;
 import pwr.zpi.socialballspring.model.FootballMatch;
 import pwr.zpi.socialballspring.model.FootballPitch;
+import pwr.zpi.socialballspring.model.MatchMember;
+import pwr.zpi.socialballspring.model.User;
 import pwr.zpi.socialballspring.repository.FootballMatchDao;
 import pwr.zpi.socialballspring.repository.FootballPitchDao;
 import pwr.zpi.socialballspring.service.FootballMatchService;
+import pwr.zpi.socialballspring.util.FunctionUtils;
 import pwr.zpi.socialballspring.util.dateUtils;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 @Service(value = "footballMatchService")
 public class FootballMatchServiceImpl implements FootballMatchService {
@@ -32,19 +37,37 @@ public class FootballMatchServiceImpl implements FootballMatchService {
     IIdentityManager identityManager;
 
     @Override
-    public List<FootballMatchResponse> findAll(Optional<Boolean> onlyMyMatches) {
-        List<FootballMatch> list = new ArrayList<>();
-        footballMatchDao.findAll().iterator().forEachRemaining(list::add);
-        if(onlyMyMatches.isPresent() && onlyMyMatches.get().equals(true)) {
-            return list.stream()
-                    .filter(
-                            m -> m.getMatchMembers().stream()
-                                    .filter(mem -> mem.getUser().getId().equals(identityManager.getCurrentUser().getId()))
-                            .count() > 0 ||
-                            m.getOrganizer().getId().equals(identityManager.getCurrentUser().getId()))
-            .map(f -> new FootballMatchResponse(f, f.getOrganizer().getId().equals(identityManager.getCurrentUser().getId()))).collect(Collectors.toList());
+    public List<FootballMatchResponse> findAll(boolean isOrganizer, boolean isPlayer, boolean isDetailed) {
+        final User currentUser = identityManager.getCurrentUser();
+
+        if (!isOrganizer && !isPlayer) {
+            return StreamSupport.stream(footballMatchDao.findAll().spliterator(), false)
+                    .map(footballMatch -> new FootballMatchResponse(footballMatch, currentUser, isDetailed))
+                    .collect(Collectors.toList());
+        }
+
+        final Stream<FootballMatchResponse> matchesAsOrganizer = currentUser
+                .getAppearancesAsMatchOrganizer()
+                .stream()
+                .filter(Objects::nonNull)
+                .map(footballMatch -> new FootballMatchResponse(footballMatch, currentUser, isDetailed));
+
+        final Stream<FootballMatchResponse> matchesAsParticipant = currentUser
+                .getAppearancesAsMatchMember()
+                .stream()
+                .map(MatchMember::getFootballMatch)
+                .filter(Objects::nonNull)
+                .map(footballMatch -> new FootballMatchResponse(footballMatch, currentUser, isDetailed));
+
+        if (isOrganizer && isPlayer) {
+            return Stream.concat(matchesAsOrganizer, matchesAsParticipant)
+                    .filter(FunctionUtils.distinctByKey(FootballMatchResponse::getId))
+                    .collect(Collectors.toList());
+        } else if (isOrganizer) {
+            return matchesAsOrganizer.collect(Collectors.toList());
+
         } else {
-            return list.stream().map(f -> new FootballMatchResponse(f, f.getOrganizer().getId().equals(identityManager.getCurrentUser().getId()))).collect(Collectors.toList());
+            return matchesAsParticipant.collect(Collectors.toList());
         }
     }
 
@@ -55,11 +78,12 @@ public class FootballMatchServiceImpl implements FootballMatchService {
 
     @Override
     public FootballMatchResponse findById(long id) {
+        final User currentUser = identityManager.getCurrentUser();
         Optional<FootballMatch> optionalFootballMatch = footballMatchDao.findById(id);
-        if(optionalFootballMatch.isPresent()){
-            return new FootballMatchResponse(optionalFootballMatch.get(), optionalFootballMatch.get().getOrganizer().getId().equals(identityManager.getCurrentUser().getId()));
+        if (optionalFootballMatch.isPresent()) {
+            return new FootballMatchResponse(optionalFootballMatch.get(), currentUser, true);
         } else {
-            throw new NotFoundException("FootballMatchResponse");
+            throw new NotFoundException("FootballMatch");
         }
     }
 
@@ -67,35 +91,30 @@ public class FootballMatchServiceImpl implements FootballMatchService {
     public FootballMatchResponse update(FootballMatchDto footballMatchDto, long id) {
         Optional<FootballMatch> optionalFootballMatch = footballMatchDao.findById(id);
         if (optionalFootballMatch.isPresent()) {
-            LocalDateTime beginningTime = dateUtils.convertFromString(footballMatchDto.getBeginningTime());
-            LocalDateTime endingTime = dateUtils.convertFromString(footballMatchDto.getEndingTime());
-            FootballPitch footballPitch = null;
-            if (footballMatchDto.getPitchId() != null) {
-                footballPitch = footballPitchDao.findById(footballMatchDto.getPitchId()).get();
-            }
-            FootballMatch footballMatch = FootballMatch.builder()
-                    .title(footballMatchDto.getTitle())
-                    .description(footballMatchDto.getDescription())
-                    .beginningTime(beginningTime)
-                    .endingTime(endingTime)
-                    .isFinished(footballMatchDto.getIsFinished())
-                    .id(id)
-                    .matchScore("0-0")
-                    .organizer(identityManager.getCurrentUser())
-                    .footballPitch(footballPitch)
-                    .build();
-            FootballMatch savedFootballMatch = footballMatchDao.save(footballMatch);
-            return new FootballMatchResponse(savedFootballMatch, savedFootballMatch.getOrganizer().getId().equals(identityManager.getCurrentUser().getId()));
-        } else throw new NotFoundException("FootballMatch");
+            footballMatchDto.setId(id);
+            return saveFootballMatchFromDto(footballMatchDto);
+        } else {
+            throw new NotFoundException("FootballMatch");
+        }
     }
 
     @Override
     public FootballMatchResponse save(FootballMatchDto footballMatchDto) {
+        return saveFootballMatchFromDto(footballMatchDto);
+    }
+
+    private FootballMatchResponse saveFootballMatchFromDto(FootballMatchDto footballMatchDto) {
+        final User currentUser = identityManager.getCurrentUser();
         LocalDateTime beginningTime = dateUtils.convertFromString(footballMatchDto.getBeginningTime());
         LocalDateTime endingTime = dateUtils.convertFromString(footballMatchDto.getEndingTime());
         FootballPitch footballPitch = null;
         if (footballMatchDto.getPitchId() != null) {
-            footballPitch = footballPitchDao.findById(footballMatchDto.getPitchId()).get();
+            Optional<FootballPitch> optionalFootballPitch = footballPitchDao.findById(footballMatchDto.getPitchId());
+            if (optionalFootballPitch.isPresent()) {
+                footballPitch = optionalFootballPitch.get();
+            } else {
+                throw new NotFoundException("FootballPitch");
+            }
         }
         FootballMatch newFootballMatch = FootballMatch.builder()
                 .title(footballMatchDto.getTitle())
@@ -103,11 +122,13 @@ public class FootballMatchServiceImpl implements FootballMatchService {
                 .beginningTime(beginningTime)
                 .endingTime(endingTime)
                 .isFinished(false)
-                .matchScore("0-0")
+                .matchScore(null)
                 .organizer(identityManager.getCurrentUser())
                 .footballPitch(footballPitch)
                 .build();
-        return new FootballMatchResponse(footballMatchDao.save(newFootballMatch), newFootballMatch.getOrganizer().getId().equals(identityManager.getCurrentUser().getId()));
+        FootballMatch savedFootballMatch = footballMatchDao.save(newFootballMatch);
+        return new FootballMatchResponse(savedFootballMatch, currentUser, true);
     }
 
+    ;
 }

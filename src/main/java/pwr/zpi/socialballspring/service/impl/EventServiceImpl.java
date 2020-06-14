@@ -9,14 +9,15 @@ import pwr.zpi.socialballspring.exception.NotFoundException;
 import pwr.zpi.socialballspring.model.Event;
 import pwr.zpi.socialballspring.model.FootballMatch;
 import pwr.zpi.socialballspring.model.MatchMember;
+import pwr.zpi.socialballspring.model.Team;
 import pwr.zpi.socialballspring.repository.EventDao;
 import pwr.zpi.socialballspring.repository.FootballMatchDao;
 import pwr.zpi.socialballspring.repository.MatchMemberDao;
 import pwr.zpi.socialballspring.service.EventService;
+import pwr.zpi.socialballspring.util.Constants;
 import pwr.zpi.socialballspring.util.dateUtils;
 
 import javax.transaction.Transactional;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -55,28 +56,18 @@ public class EventServiceImpl implements EventService {
     public EventResponse update(EventDto eventDto, long id) {
         Optional<Event> optionalEvent = eventDao.findById(id);
         if (optionalEvent.isPresent()) {
-            FootballMatch footballMatch = null;
-            if (eventDto.getFootballMatchId() != null) {
-                footballMatch = footballMatchDao.findById(eventDto.getFootballMatchId()).get();
-            }
-            MatchMember matchMember = null;
-            if (eventDto.getMatchMemberId() != null) {
-                matchMember = matchMemberDao.findById(eventDto.getMatchMemberId()).get();
-            }
-            Event event = Event.builder()
-                    .footballMatch(footballMatch)
-                    .matchMember(matchMember)
-                    .id(id)
-                    .type(eventDto.getType())
-                    .build();
-            Event savedEvent = eventDao.save(event);
-            return new EventResponse(savedEvent);
+            return saveOrUpdate(eventDto);
         } else throw new NotFoundException("Event");
     }
 
     @Override
     @Transactional
     public EventResponse save(EventDto eventDto) {
+        return saveOrUpdate(eventDto);
+    }
+
+    @Transactional
+    private EventResponse saveOrUpdate(EventDto eventDto) {
         FootballMatch footballMatch = null;
         if (eventDto.getFootballMatchId() != null) {
             final Optional<FootballMatch> existingFootballMatch = footballMatchDao.findById(eventDto.getFootballMatchId());
@@ -97,15 +88,10 @@ public class EventServiceImpl implements EventService {
                 .type(eventDto.getType())
                 .dateTime(dateUtils.convertFromString(eventDto.getDateTime()))
                 .build();
-        Event savedEvent = eventDao.save(event);
-        if(event.getType().equals("Zdobycie gola")){
-            if(event.getFootballMatch().getTeamsInvolved().get(0).getId().equals(event.getMatchMember().getTeam().getId())){
-                event.getFootballMatch().setMatchScore((Character.getNumericValue(event.getFootballMatch().getMatchScore().charAt(0))+1) + event.getFootballMatch().getMatchScore().substring(1,3));
-            } else{
-                event.getFootballMatch().setMatchScore( event.getFootballMatch().getMatchScore().substring(2) + (Character.getNumericValue(event.getFootballMatch().getMatchScore().charAt(2))+1));
-            }
-            footballMatchDao.save(event.getFootballMatch());
+        if (eventDto.getId() != null) {
+            event.setId(eventDto.getId());
         }
+        Event savedEvent = eventDao.save(event);
         return new EventResponse(savedEvent);
     }
 
@@ -118,6 +104,25 @@ public class EventServiceImpl implements EventService {
         if (footballMatchOptional.isPresent()) {
             FootballMatch newFootballMatch = footballMatchOptional.get();
             newFootballMatch.setHasProtocol(true);
+            if (newFootballMatch.getTeamsInvolved() == null) {
+                throw new NotFoundException("No teams found for match: " + newFootballMatch.getId());
+            }
+            if (newFootballMatch.getTeamsInvolved().size() < 2) {
+                throw new NotFoundException("Less than 2 teams for match: " + newFootballMatch.getId());
+            }
+            final Team team1 = newFootballMatch.getTeamsInvolved().get(0);
+            final Team team2 = newFootballMatch.getTeamsInvolved().get(1);
+            final long team1Score = newFootballMatch
+                    .getEventsInvolvingMatch()
+                    .stream()
+                    .filter(event -> event.getType().equals(Constants.EVENT_GOAL) && event.getMatchMember() != null && event.getMatchMember().getTeam().equals(team1))
+                    .count();
+            final long team2Score = newFootballMatch
+                    .getEventsInvolvingMatch()
+                    .stream()
+                    .filter(event -> event.getType().equals(Constants.EVENT_GOAL) && event.getMatchMember() != null && event.getMatchMember().getTeam().equals(team2))
+                    .count();
+            newFootballMatch.setMatchScore(team1Score + " : " + team2Score);
             footballMatchDao.save(newFootballMatch);
         } else throw new NotFoundException("FootballMatch");
         return responseEvents;

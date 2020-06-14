@@ -17,11 +17,11 @@ public class StatisticsController {
     private StatisticsService statisticsService;
     @GetMapping
     public ResponseEntity<StatisticsResponse> getStats(){
-        return new ResponseEntity<>(statisticsService.findById(), HttpStatus.OK);
+        return new ResponseEntity<>(statisticsService.findByCurrentUser(), HttpStatus.OK);
     }
     @GetMapping("/{id}")
     public ResponseEntity<StatisticsResponse> getStats(@PathVariable long id){
-        return new ResponseEntity<>(statisticsService.findByUser(id), HttpStatus.OK);
+        return new ResponseEntity<>(statisticsService.findById(id), HttpStatus.OK);
     }
     @GetMapping("/global")
     public ResponseEntity<StatisticsResponse> getGlobalStats(){

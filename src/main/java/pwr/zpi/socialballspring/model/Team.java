@@ -1,5 +1,6 @@
 package pwr.zpi.socialballspring.model;
 
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,6 +20,7 @@ public class Team {
     private int membersCount;
     private String name;
     private String shirtColours;
+    private Boolean isLeftSide;
 
     @ManyToOne()
     private FootballMatch footballMatch;
