@@ -1,6 +1,7 @@
 package pwr.zpi.socialballspring.service;
 
 import pwr.zpi.socialballspring.dto.EventDto;
+import pwr.zpi.socialballspring.dto.MatchProtocolDto;
 import pwr.zpi.socialballspring.dto.Response.EventResponse;
 
 import java.util.List;
@@ -15,4 +16,8 @@ public interface EventService {
     EventResponse findById(long id);
 
     EventResponse update(EventDto event, long id);
+
+    List<EventResponse> saveProtocol(MatchProtocolDto matchProtocolDto, long id);
+
+    List<EventResponse> findProtocol(long id);
 }

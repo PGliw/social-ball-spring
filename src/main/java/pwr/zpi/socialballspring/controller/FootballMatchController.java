@@ -6,7 +6,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pwr.zpi.socialballspring.config.IIdentityManager;
 import pwr.zpi.socialballspring.dto.FootballMatchDto;
+import pwr.zpi.socialballspring.dto.MatchProtocolDto;
+import pwr.zpi.socialballspring.dto.Response.EventResponse;
 import pwr.zpi.socialballspring.dto.Response.FootballMatchResponse;
+import pwr.zpi.socialballspring.service.EventService;
 import pwr.zpi.socialballspring.service.FootballMatchService;
 
 import java.util.List;
@@ -20,6 +23,9 @@ public class FootballMatchController {
     private FootballMatchService footballMatchService;
 
     @Autowired
+    private EventService eventService;
+
+    @Autowired
     private IIdentityManager identityManager;
 
     @PostMapping
@@ -28,8 +34,15 @@ public class FootballMatchController {
     }
 
     @GetMapping
-    public ResponseEntity<List<FootballMatchResponse>> listFootballMatch(@RequestParam Optional<Boolean> onlyMyMatches) {
-        return new ResponseEntity<>(footballMatchService.findAll(onlyMyMatches), HttpStatus.OK);
+    public ResponseEntity<List<FootballMatchResponse>> listFootballMatch(
+            @RequestParam Optional<Boolean> organizer,
+            @RequestParam Optional<Boolean> player,
+            @RequestParam Optional<Boolean> detailed
+    ) {
+        boolean isOrganizer = organizer.isPresent() && organizer.get();
+        boolean isPlayer = player.isPresent() && player.get();
+        boolean isResponseDetailed = detailed.isPresent() && detailed.get();
+        return new ResponseEntity<>(footballMatchService.findAll(isOrganizer, isPlayer, isResponseDetailed), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -46,5 +59,15 @@ public class FootballMatchController {
     public ResponseEntity<String> delete(@PathVariable long id) {
         footballMatchService.delete(id);
         return new ResponseEntity<>("FootballMatch deleted successfully", HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}/events")
+    public ResponseEntity<List<EventResponse>> getEventsByMatchId(@PathVariable long id) {
+        return new ResponseEntity<>(eventService.findProtocol(id), HttpStatus.OK);
+    }
+
+    @PostMapping("/{id}/events")
+    public ResponseEntity<List<EventResponse>> saveMatchProtocol(@RequestBody MatchProtocolDto matchProtocolDto, @PathVariable long id) {
+        return new ResponseEntity<>(eventService.saveProtocol(matchProtocolDto, id), HttpStatus.OK);
     }
 }

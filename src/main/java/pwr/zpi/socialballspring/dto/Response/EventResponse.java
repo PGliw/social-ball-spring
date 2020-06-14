@@ -7,16 +7,21 @@ import pwr.zpi.socialballspring.model.Event;
 public class EventResponse {
     private Long id;
     private String type;
-    private Long matchMemberId;
+    private String dateTime;
+    private MatchMemberResponse matchMemberResponse;
+    private Long teamId;
+    private String teamName;
     private Long footballMatchId;
 
-    public EventResponse(Event event){
+    public EventResponse(Event event) {
         this.id = event.getId();
         this.type = event.getType();
-        if(event.getMatchMember() != null){
-            this.matchMemberId = event.getMatchMember().getId();
+        if (event.getMatchMember() != null) {
+            this.matchMemberResponse = new MatchMemberResponse(event.getMatchMember());
+            this.teamId = event.getMatchMember().getTeam().getId();
+            this.teamName = event.getMatchMember().getTeam().getName();
         }
-        if(event.getFootballMatch() != null){
+        if (event.getFootballMatch() != null) {
             this.footballMatchId = event.getFootballMatch().getId();
         }
     }
