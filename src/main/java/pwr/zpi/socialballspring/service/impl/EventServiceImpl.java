@@ -129,6 +129,7 @@ public class EventServiceImpl implements EventService {
         if (footballMatchOptional.isPresent()) {
             FootballMatch newFootballMatch = footballMatchOptional.get();
             newFootballMatch.setHasProtocol(true);
+            newFootballMatch.setIsFinished(true);
             if (newFootballMatch.getTeamsInvolved() == null) {
                 throw new NotFoundException("No teams found for match: " + newFootballMatch.getId());
             }

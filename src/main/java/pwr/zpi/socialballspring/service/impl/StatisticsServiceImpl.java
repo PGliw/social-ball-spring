@@ -76,7 +76,10 @@ public class StatisticsServiceImpl implements StatisticsService {
         long fauls = 0;
         long matches = 0;
         if (appearances != null) {
-            matches = appearances.stream().filter(a -> a.getFootballMatch().getIsFinished()).count();
+            matches = appearances.stream().filter(a -> a != null
+                    && a.getFootballMatch() != null
+                    && a.getFootballMatch().getIsFinished())
+                    .count();
         }
         long minutesPlayed = 0;
         if (appearances != null) {
@@ -86,7 +89,10 @@ public class StatisticsServiceImpl implements StatisticsService {
                 yellowCards += countEventsBy(Constants.EVENT_YELLOW_CARD, events);
                 redCards += countEventsBy(Constants.EVENT_RED_CARD, events);
                 fauls += countEventsBy(Constants.EVENT_FOUL, events);
-                if (appearance.getFootballMatch().getBeginningTime() != null && appearance.getFootballMatch().getEndingTime() != null && appearance.getFootballMatch().getIsFinished()) {
+                if (appearance.getFootballMatch() != null
+                        && appearance.getFootballMatch().getBeginningTime() != null
+                        && appearance.getFootballMatch().getEndingTime() != null &&
+                        appearance.getFootballMatch().getIsFinished()) {
                     minutesPlayed = Duration.between(appearance.getFootballMatch().getBeginningTime(),
                             appearance.getFootballMatch().getEndingTime()).toMinutes();
                 }
@@ -108,14 +114,14 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     @Override
-    public TimeStatisticsResponse findTimeStats(long monthsNumber){
+    public TimeStatisticsResponse findTimeStats(long monthsNumber) {
         LocalDate localDate = LocalDate.now();
         List<FootballMatch> matchesList = new ArrayList<>();
         footballMatchDao.findAll().iterator().forEachRemaining(matchesList::add);
         List<User> users = new ArrayList<>();
         userDao.findAll().iterator().forEachRemaining(users::add);
         List<MonthStatisticsResponse> monthStatisticsResponses = new ArrayList<>();
-        for(int i = 0; i < monthsNumber; i++){
+        for (int i = 0; i < monthsNumber; i++) {
             LocalDate minusDate = localDate.minusMonths(i);
             Month month = minusDate.getMonth();
             long matches = matchesList.stream()
@@ -127,27 +133,27 @@ public class StatisticsServiceImpl implements StatisticsService {
                             .filter(p -> Objects.nonNull(p.getFootballMatch()))
                             .filter(p -> Objects.nonNull(p.getFootballMatch().getBeginningTime()))
                             .filter(p -> p.getFootballMatch().getBeginningTime().getMonth().equals(month))
-                    .collect(toList()))
+                            .collect(toList()))
                     .filter(p -> p.size() > 0)
                     .count();
-            monthStatisticsResponses.add(new MonthStatisticsResponse(month.toString()+" " + minusDate.getYear(), matches, players));
+            monthStatisticsResponses.add(new MonthStatisticsResponse(month.toString() + " " + minusDate.getYear(), matches, players));
         }
         return new TimeStatisticsResponse(monthStatisticsResponses);
     }
 
     @Override
-    public FootballPitchStatsResponse findPitchStats(){
+    public FootballPitchStatsResponse findPitchStats() {
         List<FootballPitch> pitchesList = new ArrayList<>();
         footballPitchDao.findAll().iterator().forEachRemaining(pitchesList::add);
         List<FootballMatch> matchesList = new ArrayList<>();
         footballMatchDao.findAll().iterator().forEachRemaining(matchesList::add);
         List<FootbalPitchUnitStatsResponse> responses = new ArrayList<>();
-        for (FootballPitch pitch: pitchesList){
+        for (FootballPitch pitch : pitchesList) {
             long pitchNum = matchesList.stream()
                     .filter(m -> Objects.nonNull(m.getFootballPitch()))
                     .filter(m -> m.getFootballPitch().getId().equals(pitch.getId()))
                     .count();
-            responses.add(new FootbalPitchUnitStatsResponse(new FootballPitchResponse(pitch), (double)pitchNum/matchesList.size()*100));
+            responses.add(new FootbalPitchUnitStatsResponse(new FootballPitchResponse(pitch), (double) pitchNum / matchesList.size() * 100));
         }
         return new FootballPitchStatsResponse(responses.stream().sorted(Comparator.comparingDouble(FootbalPitchUnitStatsResponse::getPercentage)).collect(Collectors.toList()));
     }
