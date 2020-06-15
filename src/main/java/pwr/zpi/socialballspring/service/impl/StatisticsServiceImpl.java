@@ -153,8 +153,13 @@ public class StatisticsServiceImpl implements StatisticsService {
                     .filter(m -> Objects.nonNull(m.getFootballPitch()))
                     .filter(m -> m.getFootballPitch().getId().equals(pitch.getId()))
                     .count();
-            responses.add(new FootbalPitchUnitStatsResponse(new FootballPitchResponse(pitch), (double) pitchNum / matchesList.size() * 100));
+            long matchesNum = matchesList.stream().filter(m -> Objects.nonNull(m.getFootballPitch())).count();
+            double percentage = 0;
+            if(matchesNum > 0){
+                percentage = (double)pitchNum/matchesNum*100;
+            }
+            responses.add(new FootbalPitchUnitStatsResponse(new FootballPitchResponse(pitch), percentage));
         }
-        return new FootballPitchStatsResponse(responses.stream().sorted(Comparator.comparingDouble(FootbalPitchUnitStatsResponse::getPercentage)).collect(Collectors.toList()));
+        return new FootballPitchStatsResponse(responses.stream().sorted(Comparator.comparingDouble(FootbalPitchUnitStatsResponse::getPercentage).reversed()).collect(Collectors.toList()));
     }
 }
