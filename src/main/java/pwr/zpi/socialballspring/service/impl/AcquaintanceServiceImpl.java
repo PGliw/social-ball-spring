@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import pwr.zpi.socialballspring.config.IdentityManager;
 import pwr.zpi.socialballspring.dto.AcquaitanceDto;
 import pwr.zpi.socialballspring.dto.Response.AcquaitanceResponse;
+import pwr.zpi.socialballspring.dto.Response.UserAcquaitanceResponse;
 import pwr.zpi.socialballspring.exception.NotFoundException;
 import pwr.zpi.socialballspring.model.Acquaintance;
 import pwr.zpi.socialballspring.model.User;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service(value = "acquitanceService")
 public class AcquaintanceServiceImpl implements AcquaintanceService {
@@ -146,6 +148,7 @@ public class AcquaintanceServiceImpl implements AcquaintanceService {
         }
     }
 
+    @Override
     public void reject(long userId){
         Optional<User> sender = userDao.findById(userId);
         if(sender.isPresent()) {
@@ -162,5 +165,22 @@ public class AcquaintanceServiceImpl implements AcquaintanceService {
         } else {
             throw new NotFoundException("User");
         }
+    }
+
+    @Override
+    public UserAcquaitanceResponse isAcquitanceSent(long userId){
+        List<Acquaintance> acquaintances = new ArrayList<>();
+        acquaitanceDao.findAll().iterator().forEachRemaining(acquaintances::add);
+        List<Long> acquaitanceIds = Stream.concat(acquaintances.stream()
+                        .filter(a -> a.getRequestSender().getId().equals(identityManager.getCurrentUser().getId()))
+                        .map(a -> a.getRequestReceiver()),
+                acquaintances.stream()
+                        .filter(a -> a.getRequestReceiver().getId().equals(identityManager.getCurrentUser().getId()))
+                        .map(a -> a.getRequestSender()))
+                .distinct()
+                .filter(u -> !u.getId().equals(identityManager.getCurrentUser().getId()))
+                .map(a -> a.getId())
+                .collect(Collectors.toList());
+        return new UserAcquaitanceResponse(acquaitanceIds.contains(userId));
     }
 }
