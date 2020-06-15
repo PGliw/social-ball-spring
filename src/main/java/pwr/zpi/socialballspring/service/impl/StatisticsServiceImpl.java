@@ -3,16 +3,12 @@ package pwr.zpi.socialballspring.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pwr.zpi.socialballspring.config.IIdentityManager;
-import pwr.zpi.socialballspring.dto.Response.MonthStatisticsResponse;
-import pwr.zpi.socialballspring.dto.Response.StatisticsResponse;
+import pwr.zpi.socialballspring.dto.Response.*;
 import pwr.zpi.socialballspring.exception.NotFoundException;
-import pwr.zpi.socialballspring.dto.Response.TimeStatisticsResponse;
-import pwr.zpi.socialballspring.model.Event;
-import pwr.zpi.socialballspring.model.FootballMatch;
-import pwr.zpi.socialballspring.model.MatchMember;
-import pwr.zpi.socialballspring.model.User;
+import pwr.zpi.socialballspring.model.*;
 import pwr.zpi.socialballspring.repository.EventDao;
 import pwr.zpi.socialballspring.repository.FootballMatchDao;
+import pwr.zpi.socialballspring.repository.FootballPitchDao;
 import pwr.zpi.socialballspring.repository.UserDao;
 import pwr.zpi.socialballspring.service.StatisticsService;
 import pwr.zpi.socialballspring.util.Constants;
@@ -20,11 +16,8 @@ import pwr.zpi.socialballspring.util.Constants;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -41,6 +34,9 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     @Autowired
     IIdentityManager identityManager;
+
+    @Autowired
+    FootballPitchDao footballPitchDao;
 
     @Override
     public StatisticsResponse findByCurrentUser() {
@@ -106,7 +102,9 @@ public class StatisticsServiceImpl implements StatisticsService {
         if (!allowedEventsTypes.contains(eventType)) {
             throw new IllegalArgumentException("Illegal value of eventType: " + eventType);
         }
-        return events.stream().filter(e -> e.getType().equals(Constants.EVENT_GOAL)).count();
+        return events.stream()
+                .filter(e -> Objects.nonNull(e.getType()))
+                .filter(e -> e.getType().equals(Constants.EVENT_GOAL)).count();
     }
 
     @Override
@@ -135,5 +133,22 @@ public class StatisticsServiceImpl implements StatisticsService {
             monthStatisticsResponses.add(new MonthStatisticsResponse(month.toString()+" " + minusDate.getYear(), matches, players));
         }
         return new TimeStatisticsResponse(monthStatisticsResponses);
+    }
+
+    @Override
+    public FootballPitchStatsResponse findPitchStats(){
+        List<FootballPitch> pitchesList = new ArrayList<>();
+        footballPitchDao.findAll().iterator().forEachRemaining(pitchesList::add);
+        List<FootballMatch> matchesList = new ArrayList<>();
+        footballMatchDao.findAll().iterator().forEachRemaining(matchesList::add);
+        List<FootbalPitchUnitStatsResponse> responses = new ArrayList<>();
+        for (FootballPitch pitch: pitchesList){
+            long pitchNum = matchesList.stream()
+                    .filter(m -> Objects.nonNull(m.getFootballPitch()))
+                    .filter(m -> m.getFootballPitch().getId().equals(pitch.getId()))
+                    .count();
+            responses.add(new FootbalPitchUnitStatsResponse(new FootballPitchResponse(pitch), (double)pitchNum/matchesList.size()*100));
+        }
+        return new FootballPitchStatsResponse(responses.stream().sorted(Comparator.comparingDouble(FootbalPitchUnitStatsResponse::getPercentage)).collect(Collectors.toList()));
     }
 }
