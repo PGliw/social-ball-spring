@@ -9,7 +9,7 @@ public class CommentResponse {
     private String dateOfAddition;
     private String content;
     private Long relatedMatchId;
-    private MatchMemberResponse relatedMatchMemberId;
+    private MatchMemberResponse relatedMatchMember;
 
     public CommentResponse(Comment comment){
         this.id = comment.getId();
@@ -21,7 +21,7 @@ public class CommentResponse {
             this.relatedMatchId = comment.getRelatedMatch().getId();
         }
         if(comment.getRelatedMatchMember() != null){
-            this.relatedMatchMemberId = new MatchMemberResponse(comment.getRelatedMatchMember());
+            this.relatedMatchMember = new MatchMemberResponse(comment.getRelatedMatchMember());
         }
     }
 }

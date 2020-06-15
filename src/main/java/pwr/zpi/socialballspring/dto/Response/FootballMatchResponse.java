@@ -22,6 +22,7 @@ public class FootballMatchResponse {
     private boolean isFinished;
     private boolean hasProtocol;
     private boolean isCurrentUserOrganizer;
+    private Long currentUserMatchMemberId;
     private String currentUserPositionName;
     private String currentUserPositionSideName;
     private String score;
@@ -77,6 +78,7 @@ public class FootballMatchResponse {
             currentMatchMember.ifPresent(matchMember -> {
                 currentUserPositionName = matchMember.getPosition().getName();
                 currentUserPositionSideName = matchMember.getPosition().getSide();
+                currentUserMatchMemberId = matchMember.getId();
             });
 
             // team names
