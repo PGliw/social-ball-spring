@@ -1,12 +1,16 @@
 package pwr.zpi.socialballspring.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import pwr.zpi.socialballspring.config.IdentityManager;
 import pwr.zpi.socialballspring.dto.CommentDto;
 import pwr.zpi.socialballspring.dto.Response.CommentResponse;
+import pwr.zpi.socialballspring.exception.BadRequestException;
 import pwr.zpi.socialballspring.exception.NotFoundException;
-import pwr.zpi.socialballspring.model.*;
+import pwr.zpi.socialballspring.model.Comment;
+import pwr.zpi.socialballspring.model.FootballMatch;
+import pwr.zpi.socialballspring.model.MatchMember;
 import pwr.zpi.socialballspring.repository.CommentDao;
 import pwr.zpi.socialballspring.repository.FootballMatchDao;
 import pwr.zpi.socialballspring.repository.MatchMemberDao;
@@ -39,10 +43,10 @@ public class CommentServiceImpl implements CommentService {
         List<Comment> list = new ArrayList<>();
         commentDao.findAll().iterator().forEachRemaining(list::add);
         Stream<Comment> comments = list.stream();
-        if(matchId.isPresent()){
+        if (matchId.isPresent()) {
             comments = comments.filter(c -> c.getRelatedMatch().getId().equals(matchId.get()));
         }
-        if(userId.isPresent()){
+        if (userId.isPresent()) {
             comments = comments.filter(c -> c.getRelatedMatchMember().getUser().getId().equals(userId.get()));
         }
         return comments.map(CommentResponse::new).collect(Collectors.toList());
@@ -65,11 +69,11 @@ public class CommentServiceImpl implements CommentService {
         if (optionalComment.isPresent()) {
             LocalDateTime dateOfAddition = dateUtils.convertFromString(commentDto.getDateOfAddition());
             FootballMatch footballMatch = null;
-            if(commentDto.getRelatedMatchId() != null){
+            if (commentDto.getRelatedMatchId() != null) {
                 footballMatch = footballMatchDao.findById(commentDto.getRelatedMatchId()).get();
             }
             MatchMember matchMember = null;
-            if(commentDto.getRelatedMatchMemberId() != null) {
+            if (commentDto.getRelatedMatchMemberId() != null) {
                 matchMember = matchMemberDao.findById(commentDto.getRelatedMatchMemberId()).get();
             }
             Comment comment = Comment.builder()
@@ -86,23 +90,28 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public CommentResponse save(CommentDto commentDto) {
-        LocalDateTime dateOfAddition = dateUtils.convertFromString(commentDto.getDateOfAddition());
-        FootballMatch footballMatch = null;
-        if(commentDto.getRelatedMatchId() != null){
-            footballMatch = footballMatchDao.findById(commentDto.getRelatedMatchId()).get();
-        }
-        MatchMember matchMember = null;
-        List<MatchMember> matchMembers = new ArrayList<>();
-        matchMemberDao.findAll().iterator().forEachRemaining(matchMembers::add);
-        FootballMatch finalFootballMatch = footballMatch;
-        if(footballMatch != null) {
-            Optional<MatchMember> matchMemberOpt = matchMembers.stream()
-                    .filter(m -> m.getUser().getId().equals(identityManager.getCurrentUser().getId()))
-                    .filter(m -> m.getFootballMatch().getId().equals(finalFootballMatch.getId()))
-                    .findFirst();
-            if(matchMemberOpt.isPresent()){
-                matchMember = matchMemberOpt.get();
+        final LocalDateTime dateOfAddition = dateUtils.convertFromString(commentDto.getDateOfAddition());
+        FootballMatch footballMatch;
+        if (commentDto.getRelatedMatchId() != null) {
+            final Optional<FootballMatch> optionalFootballMatch = footballMatchDao.findById(commentDto.getRelatedMatchId());
+            if (optionalFootballMatch.isPresent()) {
+                footballMatch = optionalFootballMatch.get();
+            } else {
+                throw new NotFoundException("FootballMatch");
             }
+        } else {
+            throw new BadRequestException("relatedMatchId is null!");
+        }
+        MatchMember matchMember;
+        if (commentDto.getRelatedMatchMemberId() != null) {
+            final Optional<MatchMember> optionalMatchMember= matchMemberDao.findById(commentDto.getRelatedMatchMemberId());
+            if (optionalMatchMember.isPresent()) {
+                matchMember = optionalMatchMember.get();
+            } else {
+                throw new NotFoundException("MatchMember");
+            }
+        } else {
+            throw new BadRequestException("relatedMatchMemberId is null!");
         }
         Comment comment = Comment.builder()
                 .relatedMatch(footballMatch)
