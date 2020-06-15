@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import pwr.zpi.socialballspring.config.IIdentityManager;
 import pwr.zpi.socialballspring.dto.AcquaitanceDto;
 import pwr.zpi.socialballspring.dto.Response.AcquaitanceResponse;
+import pwr.zpi.socialballspring.dto.Response.UserAcquaitanceResponse;
 import pwr.zpi.socialballspring.service.AcquaintanceService;
 
 import java.util.List;
@@ -34,6 +35,11 @@ public class AcquaitanceController {
     @GetMapping("/{id}")
     public ResponseEntity<AcquaitanceResponse> getOne(@PathVariable long id) {
         return new ResponseEntity<>(acquaintanceService.findById(id), HttpStatus.OK);
+    }
+
+    @GetMapping("/acquitanceSent")
+    public ResponseEntity<UserAcquaitanceResponse> acquitanceSent(@RequestParam long userId){
+        return new ResponseEntity<>(acquaintanceService.isAcquitanceSent(userId), HttpStatus.OK);
     }
 
     @PutMapping("/{id}")

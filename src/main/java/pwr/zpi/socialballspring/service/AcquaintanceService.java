@@ -2,6 +2,7 @@ package pwr.zpi.socialballspring.service;
 
 import pwr.zpi.socialballspring.dto.AcquaitanceDto;
 import pwr.zpi.socialballspring.dto.Response.AcquaitanceResponse;
+import pwr.zpi.socialballspring.dto.Response.UserAcquaitanceResponse;
 
 import java.util.List;
 
@@ -21,4 +22,6 @@ public interface AcquaintanceService {
     void accept(long id);
 
     void reject(long id);
+
+    UserAcquaitanceResponse isAcquitanceSent(long id);
 }
