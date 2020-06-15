@@ -124,6 +124,17 @@ public class EventServiceImpl implements EventService {
     @Transactional
     public List<EventResponse> saveProtocol(MatchProtocolDto matchProtocolDto, long id) {
         final List<EventDto> dtoEvents = matchProtocolDto.getEvents().stream().peek(eventDto -> eventDto.setFootballMatchId(id)).collect(Collectors.toList());
+        final List<Long> dtoEventsIds = dtoEvents.stream().map(e -> e.getId()).collect(Collectors.toList());
+        List<Event> eventsList = new ArrayList<>();
+        eventDao.findAll().iterator().forEachRemaining(eventsList::add);
+        final List<Long> eventsIds = eventsList.stream()
+                .filter(e -> e.getFootballMatch().getId().equals(id))
+                .map(e -> e.getId())
+                .collect(Collectors.toList());
+        eventsIds.removeAll(dtoEventsIds);
+        for (Long eventId: eventsIds) {
+            eventDao.deleteById(eventId);
+        }
         final List<EventResponse> responseEvents = dtoEvents.stream().map(this::save).collect(Collectors.toList());
         final Optional<FootballMatch> footballMatchOptional = footballMatchDao.findById(id);
         if (footballMatchOptional.isPresent()) {
