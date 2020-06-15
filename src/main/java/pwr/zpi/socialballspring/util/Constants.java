@@ -18,4 +18,5 @@ public class Constants {
     public static final String FRIENDSHIP_STATUS_PENDING = "pending";
     public static final String FRIENDSHIP_STATUS_ACCEPTED = "accepted";
     public static final String FRIENDSHIP_STATUS_REJECTED = "rejected";
+    public static final String FRIENDSHIP_STATUS_NONE = "none";
 }

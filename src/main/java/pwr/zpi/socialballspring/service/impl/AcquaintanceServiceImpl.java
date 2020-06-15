@@ -68,6 +68,24 @@ public class AcquaintanceServiceImpl implements AcquaintanceService {
     }
 
     @Override
+    public AcquaitanceResponse findByOtherUserId(long otherUserId) {
+        User currentUser = identityManager.getCurrentUser();
+        Acquaintance foundAcquaintance = null;
+        Optional<Acquaintance> optionalAcquaintanceSentByOther = acquaitanceDao
+                .findAcquaintanceByRequestSenderIdAndRequestReceiverId(otherUserId, currentUser.getId());
+        if (optionalAcquaintanceSentByOther.isPresent()) {
+            foundAcquaintance = optionalAcquaintanceSentByOther.get();
+        } else {
+            Optional<Acquaintance> optionalAcquaintanceSentByMe = acquaitanceDao
+                    .findAcquaintanceByRequestSenderIdAndRequestReceiverId(currentUser.getId(), otherUserId);
+            if (optionalAcquaintanceSentByMe.isPresent()) {
+                foundAcquaintance = optionalAcquaintanceSentByMe.get();
+            }
+        }
+        return new AcquaitanceResponse(foundAcquaintance);
+    }
+
+    @Override
     public AcquaitanceResponse update(AcquaitanceDto acquaitanceDto, long id) {
         Optional<Acquaintance> optionalAcquaintance = acquaitanceDao.findById(id);
         if (optionalAcquaintance.isPresent()) {
@@ -114,7 +132,7 @@ public class AcquaintanceServiceImpl implements AcquaintanceService {
     }
 
     @Override
-    public void send(long userId) {
+    public AcquaitanceResponse send(long userId) {
         Optional<User> receiver = userDao.findById(userId);
         if (receiver.isPresent()) {
             Acquaintance acquaintance = Acquaintance.builder()
@@ -122,22 +140,24 @@ public class AcquaintanceServiceImpl implements AcquaintanceService {
                     .requestReceiver(receiver.get())
                     .status(Constants.FRIENDSHIP_STATUS_PENDING)
                     .build();
-            acquaitanceDao.save(acquaintance);
+            Acquaintance savedAcq = acquaitanceDao.save(acquaintance);
+            return new AcquaitanceResponse(savedAcq);
         } else {
             throw new NotFoundException("User");
         }
     }
 
     @Override
-    public void accept(long userId) {
-        decideInvitation(userId, Constants.FRIENDSHIP_STATUS_ACCEPTED);
+    public AcquaitanceResponse accept(long userId) {
+        return decideInvitation(userId, Constants.FRIENDSHIP_STATUS_ACCEPTED);
     }
 
-    public void reject(long userId) {
-        decideInvitation(userId, Constants.FRIENDSHIP_STATUS_REJECTED);
+    @Override
+    public AcquaitanceResponse reject(long userId) {
+        return decideInvitation(userId, Constants.FRIENDSHIP_STATUS_REJECTED);
     }
 
-    private void decideInvitation(long senderId, String decisionStatus) {
+    private AcquaitanceResponse decideInvitation(long senderId, String decisionStatus) {
         Optional<User> sender = userDao.findById(senderId);
         if (sender.isPresent()) {
             List<Acquaintance> list = new ArrayList<>();
@@ -148,7 +168,10 @@ public class AcquaintanceServiceImpl implements AcquaintanceService {
                     .findFirst();
             if (acquaintance.isPresent()) {
                 acquaintance.get().setStatus(decisionStatus);
-                acquaitanceDao.save(acquaintance.get());
+                Acquaintance savedAcq = acquaitanceDao.save(acquaintance.get());
+                return new AcquaitanceResponse(savedAcq);
+            } else {
+                return new AcquaitanceResponse(null);
             }
         } else {
             throw new NotFoundException("User");
@@ -156,7 +179,7 @@ public class AcquaintanceServiceImpl implements AcquaintanceService {
     }
 
     @Override
-    public UserAcquaitanceResponse isAcquitanceSent(long userId){
+    public UserAcquaitanceResponse isAcquitanceSent(long userId) {
         List<Acquaintance> acquaintances = new ArrayList<>();
         acquaitanceDao.findAll().iterator().forEachRemaining(acquaintances::add);
         List<Long> acquaitanceIds = Stream.concat(acquaintances.stream()

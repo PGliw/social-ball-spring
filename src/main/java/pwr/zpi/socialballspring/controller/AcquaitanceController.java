@@ -32,13 +32,18 @@ public class AcquaitanceController {
         return new ResponseEntity<>(acquaintanceService.findAll(identityManager.getCurrentUser().getId(), status), HttpStatus.OK);
     }
 
+    @GetMapping("/withUser/{id}")
+    public ResponseEntity<AcquaitanceResponse> getByOtherUserId(@PathVariable long id) {
+        return new ResponseEntity<>(acquaintanceService.findByOtherUserId(id), HttpStatus.OK);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<AcquaitanceResponse> getOne(@PathVariable long id) {
         return new ResponseEntity<>(acquaintanceService.findById(id), HttpStatus.OK);
     }
 
     @GetMapping("/acquitanceSent")
-    public ResponseEntity<UserAcquaitanceResponse> acquitanceSent(@RequestParam long userId){
+    public ResponseEntity<UserAcquaitanceResponse> acquitanceSent(@RequestParam long userId) {
         return new ResponseEntity<>(acquaintanceService.isAcquitanceSent(userId), HttpStatus.OK);
     }
 
@@ -48,23 +53,23 @@ public class AcquaitanceController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable long id) {
+    public ResponseEntity<Object> delete(@PathVariable long id) {
         acquaintanceService.delete(id);
-        return new ResponseEntity<>("Acquaitance deleted successfully", HttpStatus.OK);
+        return new ResponseEntity<>(new Object(), HttpStatus.OK);
     }
 
     @PutMapping("/send")
-    public void send(@RequestParam long receiverId){
-        acquaintanceService.send(receiverId);
+    public ResponseEntity<AcquaitanceResponse> send(@RequestParam long receiverId) {
+        return new ResponseEntity<>(acquaintanceService.send(receiverId), HttpStatus.OK);
     }
 
     @PutMapping("/accept")
-    public void accept(@RequestParam long senderId){
-        acquaintanceService.accept(senderId);
+    public ResponseEntity<AcquaitanceResponse> accept(@RequestParam long senderId) {
+        return new ResponseEntity<>(acquaintanceService.accept(senderId), HttpStatus.OK);
     }
 
     @PutMapping("/reject")
-    public void reject(@RequestParam long senderId){
-        acquaintanceService.reject(senderId);
+    public ResponseEntity<AcquaitanceResponse> reject(@RequestParam long senderId) {
+        return new ResponseEntity<>(acquaintanceService.reject(senderId), HttpStatus.OK);
     }
 }

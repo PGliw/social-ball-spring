@@ -15,13 +15,15 @@ public interface AcquaintanceService {
 
     AcquaitanceResponse findById(long id);
 
+    AcquaitanceResponse findByOtherUserId(long otherUserId);
+
     AcquaitanceResponse update(AcquaitanceDto acquaintance, long id);
 
-    void send(long id);
+    AcquaitanceResponse send(long id);
 
-    void accept(long id);
+    AcquaitanceResponse accept(long id);
 
-    void reject(long id);
+    AcquaitanceResponse reject(long id);
 
     UserAcquaitanceResponse isAcquitanceSent(long id);
 }
