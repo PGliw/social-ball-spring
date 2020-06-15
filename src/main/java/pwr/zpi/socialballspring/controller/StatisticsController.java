@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pwr.zpi.socialballspring.dto.Response.FootballPitchStatsResponse;
 import pwr.zpi.socialballspring.dto.Response.StatisticsResponse;
 import pwr.zpi.socialballspring.dto.Response.TimeStatisticsResponse;
 import pwr.zpi.socialballspring.service.StatisticsService;
@@ -31,5 +32,9 @@ public class StatisticsController {
     @GetMapping("/time")
     public ResponseEntity<TimeStatisticsResponse> getTimeStats(@RequestParam long monthsNumber){
         return new ResponseEntity<>(statisticsService.findTimeStats(monthsNumber), HttpStatus.OK);
+    }
+    @GetMapping("/pitch")
+    public ResponseEntity<FootballPitchStatsResponse> getPitchStats(){
+        return new ResponseEntity<>(statisticsService.findPitchStats(), HttpStatus.OK);
     }
 }

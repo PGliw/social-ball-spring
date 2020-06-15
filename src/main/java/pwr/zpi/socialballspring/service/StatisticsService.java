@@ -1,5 +1,6 @@
 package pwr.zpi.socialballspring.service;
 
+import pwr.zpi.socialballspring.dto.Response.FootballPitchStatsResponse;
 import pwr.zpi.socialballspring.dto.Response.StatisticsResponse;
 import pwr.zpi.socialballspring.dto.Response.TimeStatisticsResponse;
 
@@ -8,4 +9,5 @@ public interface StatisticsService {
     StatisticsResponse findByCurrentUser();
     StatisticsResponse findGlobal();
     TimeStatisticsResponse findTimeStats(long monthsNumber);
+    FootballPitchStatsResponse findPitchStats();
 }
