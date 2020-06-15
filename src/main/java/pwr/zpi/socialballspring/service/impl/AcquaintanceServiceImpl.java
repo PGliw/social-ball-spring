@@ -11,6 +11,7 @@ import pwr.zpi.socialballspring.model.User;
 import pwr.zpi.socialballspring.repository.AcquaitanceDao;
 import pwr.zpi.socialballspring.repository.UserDao;
 import pwr.zpi.socialballspring.service.AcquaintanceService;
+import pwr.zpi.socialballspring.util.Constants;
 import pwr.zpi.socialballspring.util.dateUtils;
 
 import java.time.LocalDateTime;
@@ -34,24 +35,22 @@ public class AcquaintanceServiceImpl implements AcquaintanceService {
     public List<AcquaitanceResponse> findAll(long id, String status) {
         List<Acquaintance> list = new ArrayList<>();
         acquaitanceDao.findAll().iterator().forEachRemaining(list::add);
-        if(status.equals("pending")) {
-            return list.stream()
-                    .filter(a -> a.getRequestReceiver().getId().equals(id))
-                    .filter(a -> a.getStatus().equals(status))
-                    .map(AcquaitanceResponse::new).collect(Collectors.toList());
-        }
-        else if(status.equals("accepted")) {
-            return list.stream()
-                    .filter(a -> a.getRequestReceiver().getId().equals(id) || a.getRequestSender().getId().equals(id))
-                    .filter(a -> a.getStatus().equals(status))
-                    .map(AcquaitanceResponse::new).collect(Collectors.toList());
-        } else if(status.equals("rejected")) {
-            return list.stream()
-                    .filter(a -> a.getRequestReceiver().getId().equals(id) || a.getRequestSender().getId().equals(id))
-                    .filter(a -> a.getStatus().equals(status))
-                    .map(AcquaitanceResponse::new).collect(Collectors.toList());
-        } else {
-            throw new NotFoundException("Status");
+        switch (status) {
+            case Constants.FRIENDSHIP_STATUS_PENDING:
+                return list.stream()
+                        .filter(a -> a.getRequestReceiver() != null && a.getRequestReceiver().getId().equals(id))
+                        .filter(a -> a.getStatus() != null && a.getStatus().equals(status))
+                        .map(AcquaitanceResponse::new).collect(Collectors.toList());
+            case Constants.FRIENDSHIP_STATUS_ACCEPTED:
+            case Constants.FRIENDSHIP_STATUS_REJECTED:
+                return list.stream()
+                        .filter(a -> (a.getRequestReceiver() != null
+                                && a.getRequestReceiver().getId().equals(id)) ||
+                                a.getRequestSender().getId().equals(id))
+                        .filter(a -> a.getStatus().equals(status))
+                        .map(AcquaitanceResponse::new).collect(Collectors.toList());
+            default:
+                throw new NotFoundException("Status");
         }
     }
 
@@ -72,11 +71,11 @@ public class AcquaintanceServiceImpl implements AcquaintanceService {
         if (optionalAcquaintance.isPresent()) {
             LocalDateTime dateOfAcceptance = dateUtils.convertFromString(acquaitanceDto.getDateOfAcceptance());
             User sender = null;
-            if(acquaitanceDto.getRequestSenderId() != null){
+            if (acquaitanceDto.getRequestSenderId() != null) {
                 sender = userDao.findById(acquaitanceDto.getRequestSenderId()).get();
             }
             User receiver = null;
-            if(acquaitanceDto.getRequestReceiverId() != null){
+            if (acquaitanceDto.getRequestReceiverId() != null) {
                 receiver = userDao.findById(acquaitanceDto.getRequestReceiverId()).get();
             }
             Acquaintance acquaintance = Acquaintance.builder()
@@ -95,11 +94,11 @@ public class AcquaintanceServiceImpl implements AcquaintanceService {
     public AcquaitanceResponse save(AcquaitanceDto acquaitanceDto) {
         LocalDateTime dateOfAcceptance = dateUtils.convertFromString(acquaitanceDto.getDateOfAcceptance());
         User sender = null;
-        if(acquaitanceDto.getRequestSenderId() != null){
+        if (acquaitanceDto.getRequestSenderId() != null) {
             sender = userDao.findById(acquaitanceDto.getRequestSenderId()).get();
         }
         User receiver = null;
-        if(acquaitanceDto.getRequestReceiverId() != null){
+        if (acquaitanceDto.getRequestReceiverId() != null) {
             receiver = userDao.findById(acquaitanceDto.getRequestReceiverId()).get();
         }
         Acquaintance acquaintance = Acquaintance.builder()
@@ -115,11 +114,11 @@ public class AcquaintanceServiceImpl implements AcquaintanceService {
     @Override
     public void send(long userId) {
         Optional<User> receiver = userDao.findById(userId);
-        if(receiver.isPresent()) {
+        if (receiver.isPresent()) {
             Acquaintance acquaintance = Acquaintance.builder()
                     .requestSender(identityManager.getCurrentUser())
                     .requestReceiver(receiver.get())
-                    .status("pending")
+                    .status(Constants.FRIENDSHIP_STATUS_PENDING)
                     .build();
             acquaitanceDao.save(acquaintance);
         } else {
@@ -128,35 +127,25 @@ public class AcquaintanceServiceImpl implements AcquaintanceService {
     }
 
     @Override
-    public void accept(long userId){
-        Optional<User> sender = userDao.findById(userId);
-        if(sender.isPresent()) {
-            List<Acquaintance> list = new ArrayList<>();
-            acquaitanceDao.findAll().iterator().forEachRemaining(list::add);
-            Optional<Acquaintance> acquaintance = list.stream()
-                    .filter(a -> a.getRequestReceiver().getId().equals(identityManager.getCurrentUser().getId()))
-                    .filter(a -> a.getRequestSender().getId().equals(userId))
-                    .findFirst();
-            if(acquaintance.isPresent()) {
-                acquaintance.get().setStatus("accepted");
-                acquaitanceDao.save(acquaintance.get());
-            }
-        } else {
-            throw new NotFoundException("User");
-        }
+    public void accept(long userId) {
+        decideInvitation(userId, Constants.FRIENDSHIP_STATUS_ACCEPTED);
     }
 
-    public void reject(long userId){
-        Optional<User> sender = userDao.findById(userId);
-        if(sender.isPresent()) {
+    public void reject(long userId) {
+        decideInvitation(userId, Constants.FRIENDSHIP_STATUS_REJECTED);
+    }
+
+    private void decideInvitation(long senderId, String decisionStatus) {
+        Optional<User> sender = userDao.findById(senderId);
+        if (sender.isPresent()) {
             List<Acquaintance> list = new ArrayList<>();
             acquaitanceDao.findAll().iterator().forEachRemaining(list::add);
             Optional<Acquaintance> acquaintance = list.stream()
                     .filter(a -> a.getRequestReceiver().getId().equals(identityManager.getCurrentUser().getId()))
-                    .filter(a -> a.getRequestSender().getId().equals(userId))
+                    .filter(a -> a.getRequestSender().getId().equals(senderId))
                     .findFirst();
-            if(acquaintance.isPresent()) {
-                acquaintance.get().setStatus("rejected");
+            if (acquaintance.isPresent()) {
+                acquaintance.get().setStatus(decisionStatus);
                 acquaitanceDao.save(acquaintance.get());
             }
         } else {
