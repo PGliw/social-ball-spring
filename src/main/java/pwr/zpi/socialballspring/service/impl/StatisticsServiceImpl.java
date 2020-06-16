@@ -78,6 +78,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         if (appearances != null) {
             matches = appearances.stream().filter(a -> a != null
                     && a.getFootballMatch() != null
+                    && a.getFootballMatch().getIsFinished() != null
                     && a.getFootballMatch().getIsFinished())
                     .count();
         }
@@ -91,8 +92,9 @@ public class StatisticsServiceImpl implements StatisticsService {
                 fauls += countEventsBy(Constants.EVENT_FOUL, events);
                 if (appearance.getFootballMatch() != null
                         && appearance.getFootballMatch().getBeginningTime() != null
-                        && appearance.getFootballMatch().getEndingTime() != null &&
-                        appearance.getFootballMatch().getIsFinished()) {
+                        && appearance.getFootballMatch().getEndingTime() != null
+                        && appearance.getFootballMatch().getIsFinished() != null
+                        && appearance.getFootballMatch().getIsFinished()) {
                     minutesPlayed = Duration.between(appearance.getFootballMatch().getBeginningTime(),
                             appearance.getFootballMatch().getEndingTime()).toMinutes();
                 }
@@ -155,8 +157,8 @@ public class StatisticsServiceImpl implements StatisticsService {
                     .count();
             long matchesNum = matchesList.stream().filter(m -> Objects.nonNull(m.getFootballPitch())).count();
             double percentage = 0;
-            if(matchesNum > 0){
-                percentage = (double)pitchNum/matchesNum*100;
+            if (matchesNum > 0) {
+                percentage = (double) pitchNum / matchesNum * 100;
             }
             responses.add(new FootbalPitchUnitStatsResponse(new FootballPitchResponse(pitch), percentage));
         }
