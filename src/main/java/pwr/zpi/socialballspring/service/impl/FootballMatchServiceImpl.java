@@ -17,6 +17,7 @@ import pwr.zpi.socialballspring.util.FunctionUtils;
 import pwr.zpi.socialballspring.util.dateUtils;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
